@@ -1,7 +1,10 @@
 #include<stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define FIELDSIZE 10
+
+#define FIELDSIZEX 10
+#define FIELDSIZEY 7
 
 // structs
 struct idea{
@@ -10,7 +13,7 @@ struct idea{
 };
 
 // globals
-struct idea ideas[FIELDSIZE][FIELDSIZE];
+struct idea ideas[FIELDSIZEY][FIELDSIZEX];
 
 
 // methods
@@ -19,7 +22,9 @@ void genOutput();
 void doStep();
 
 int main() {
-    initIdeas(10, 6);
+    time_t t;
+    srand((unsigned) time(&t));
+    initIdeas(5, 6);
     for(int i = 0; i < 10; i++){
         doStep();
         genOutput();
@@ -28,31 +33,47 @@ int main() {
 }
 
 
-//
+// bei negetivem Input gilt BIBO
 void initIdeas(int Number, int maxTraits){
     int i = 0;
-    while(i < Number){
-        int x = rand() % FIELDSIZE;
-        int y = rand() % FIELDSIZE;
-         // hier noch bug, da rand() von 0 bis randmax geht
-        if(ideas[x][y].complexity == 0 && ideas[x][y].persuasiveness == 0){
-            ideas[x][y].complexity = rand() % maxTraits;
-            ideas[x][y].persuasiveness = rand() % (maxTraits - ideas[x][y].complexity);
+    while(i <= Number){
+        int x = rand() % FIELDSIZEX;
+        int y = rand() % FIELDSIZEY;
+        if(ideas[y][x].complexity == 0 && ideas[y][x].persuasiveness == 0){
+            ideas[y][x].complexity = rand() % maxTraits;
+            ideas[y][x].persuasiveness = rand() % (maxTraits - ideas[y][x].complexity);
             i++;
         }
     }
 }
 
 void genOutput(){
-    for(int x = 0; x < 10; x ++){
-    for(int y = 0; y < 10; y ++){
-        printf("(%d %d) ", ideas[x][y].complexity, ideas[x][y].persuasiveness);
+    for(int y = 0; y < FIELDSIZEY; y++){
+        for(int x = 0; x < FIELDSIZEX; x++){
+            printf("(%d %d) ", ideas[y][x].complexity, ideas[y][x].persuasiveness);
+        }
+        printf("\n");
     }
     printf("\n");
-  }
-  printf("\n");
 }
 
 void doStep(){
+    for(int y = 0; y < FIELDSIZEY; y++){
+        for(int x = 0; x < FIELDSIZEX; x++){
+            if(!(ideas[y][x].complexity == 0 || ideas[y][x].persuasiveness == 0)){
+                int xoffset = (rand() % 2) - (rand() % 2);
+                int newx = x + xoffset;
+                int yoffset = (rand() % 2) - (rand() % 2);
+                int newy = y + yoffset;
+//              printf("x: %d. y: %d. xoffest: %d. yoffset: %d. \n", x, y, xoffset, yoffset); bug, wird nicht Number-oft aufgerufen, idk why
+                if(newx >= 0 && newx < FIELDSIZEX && newy >= 0 && newy < FIELDSIZEY && (ideas[newy][newx].complexity == 0 && ideas[newy][newx].persuasiveness == 0)){
+                    ideas[newy][newx].complexity = ideas[y][x].complexity;
+                    ideas[newy][newx].persuasiveness = ideas[y][x].persuasiveness;
+                    ideas[y][x].complexity = 0;
+                    ideas[y][x].persuasiveness = 0;
+                }
 
+            }
+        }
+    }
 }
