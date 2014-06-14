@@ -1,0 +1,41 @@
+
+Moin,
+ersteinmal: Das ist nur ein Vorschlag, ich möchte euch das nicht aufoktroyieren.
+
+Beschreibung:
+Die Idee ist zu simmulieren wie sich eine Idee/Überzeugung zu einem Thema in einer Referenzgruppe durchsetzt.
+Dazu habe ich mir erst einmal ein einfaches Modell überlegt, wie Ideen strukturiert sind und wie sich das auf ihre Verbreitung auswirkt (das lässt sich ja beliebig verändern).
+
+Modell:
+Eine Idee hat zwei (relevante) Eigenschaften,
+Komplexität/Gehalt und Vermittlungsfähigkeit (Eigenschaft wie einfach sie kommuniziert werden kann).
+Die Komplexität wirkt sich natürlich auf die Überzeugungskraft einer Idee aus (sticht also bei erfolgreicher Vermittlung eine "einfachere" Idee). eine Komplexe Idee ist dafür aber nicht so schnell/einfach zu vermitteln und hat eine "Verständnisbarriere" (Vermittlungsversuch kann fehlschlagen).
+Natürlich kann man jetzt sagen: Brauchen wir nicht zu testen, eine Idee die Supervermittlungsfähig ist und Komplex wird sich durchsetzen, Fall abgeschlossen. Aber wie zuvor erwähnt, stehen die Eigenschaften in Abhängigkeit zueinander. Also wird es so eine "Superidee" nicht geben.
+Theoretisch gesehen: je komplexer, desto weniger vermittlungsfähig. Die umgekehrte Richtung sehe ich allerdings nicht direkt gegeben (wobei das muss noch ausdiskutiert werden).
+
+Gedanken zur Umsetzung:
+Init:
+Ein Mensch wird ein struct mit 2 Feldern (die beiden Eigenschaften (mit 0,0 initialisiert)).
+Die Welt ist eine 2-dim-Matrix in der sich Pointer auf die Menschen befinden, "leere Felder" sind Null-Pointer.
+Auf n "Menschen" spawnen wir "gefüllte" Ideen.
+Die Eigenschaften könnte man würfeln, wobei es n Punkte zu verteilen gibt, Verteilt wird nach dem Muster, geht glaub ich besser in Pseudocode, als in Worten:
+    compl = rand(1 to  (n-1));
+    comm = rand(1 to (n - 1 - compl));
+
+Verlauf:
+Jede Runde "zieht" jeder Mensch ein zufällig Feld.
+Wenn sich in den 8 Feldern Umkreis ein anderer Mensch konkurieren die beiden Ideen.
+Die Idee, die gewinnt überschreibt die andere.
+Konkuriert wird durch Wahrscheinlichkeiten, die nach dem Modell gesetzt werden (und einen geringen Zufallswert um das ganze nicht ganz deterministisch zu machen).
+
+allgemeine Schwächen (die mir spontan einfallen):
+-Ich konnte bisher keine Literatur/Mathematik außer ein wenig aus dem viralen Marketing finden.
+-Ist ein wenig ohne Umfang, da ursprünglich nicht als 3-Mann-Projekt geplant.
+-Die Parallelisierung wurde aller wahrscheinlichkeit nach schonmal bei der Infektionssimmulation gemacht (ich habe es mir allerdings noch nicht angesehen).
+
+Damit wäre ich mit der Beschreibung durch. Ich hoffe, dass das hier es etwas verständlicher gemacht hat.
+
+Wie steht es mit euren LaTex-Kenntnissen. Ich frage, da wir eine Ausarbeitung und ein Präsentation schreiben sollen.
+Im speziellen, habt ihr schonmal mit BibTex (wenn wir gute Quellen finden) und der Beamer-Klasse (welch bescheuerte Benennung) gearbeitet?
+
+Lg, Arne. 
