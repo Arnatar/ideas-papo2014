@@ -1,0 +1,6 @@
+main:
+  build: .
+  command: bash
+  volumes:
+    - .:/code
+  working_dir: /code
