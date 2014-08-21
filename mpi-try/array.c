@@ -1,26 +1,10 @@
 // #define NDEBUG // no debugging
 #include "constants.h"
-#include "headers/logic.h"
-#include "headers/idea.h"
+#include "idea.h"
+#include "logic.h"
 
 int start_simulation() {
-  int field[SIZE][SIZE];
-  // fill_matrix_with_zeros(field);
-  // fill_matrix_with_ideas(field);
-
-#define ROUNDS 1
-  // prfield();
-  // for(int i=0; i<ROUNDS; i++) {
-    // move_ideas(field);
-  // }
-}
-
-
-int main() {
-  pre();
-
   srand(time(NULL));
-  // start_simulation();
   
   Idea field[SIZE][SIZE];
   fill_matrix_with(field, idea_empty());
@@ -38,25 +22,19 @@ int main() {
 
   pr_field();
 
+  // fill_matrix_with_zeros(field);
+  // fill_matrix_with_ideas(field);
 
-
-
-
-
-
-
-
-
-  // pra2(field,SIZE);
-
-
-
-  // Idea* ideas[] = {&i,&j};
-  // pra(ideas);
-
-
-
-
-  // pre();
+#define ROUNDS 1
+  // prfield();
+  // for(int i=0; i<ROUNDS; i++) {
+    // move_ideas(field);
+  // }
 }
 
+
+int main() {
+  pre();
+  start_simulation();
+
+}

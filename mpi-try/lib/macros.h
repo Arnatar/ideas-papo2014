@@ -14,6 +14,8 @@
 #define pr_idea(idea)                             \
   printf("(%d,%d,%d) ",idea.a, idea.b, idea.c) \
 
+  
+
   // print array of ideas
 #define pr_field()                                     \
     for(int i=0; i<SIZE; i++) {                        \

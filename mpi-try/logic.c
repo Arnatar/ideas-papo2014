@@ -1,6 +1,12 @@
 #include "constants.h"
-#include "headers/idea.h"
+#include "idea.h"
 
+
+int wins_over(Idea i1, Idea i2) {
+  int first_wins = (i1.a > i2.a);
+  if (first_wins) { pr_idea((first_wins? i1 : i2)); prs("wins. result:\n"); }
+  return first_wins;
+}
 
 void move_ideas(Idea field[][SIZE]) {
   Idea old[SIZE][SIZE];
@@ -16,7 +22,6 @@ void move_ideas(Idea field[][SIZE]) {
         int move_x = rand_int(3,-1);
         int move_y = rand_int(3,-1);
 
-
         // if cell actually moves 
         if (move_x || move_y) {
           prs("---");
@@ -27,8 +32,7 @@ void move_ideas(Idea field[][SIZE]) {
           new_y = new_y == SIZE ? 0 : new_y == -1 ? SIZE-1 : new_y;
           Idea neighbor_idea = field[new_y][new_x];
 
-          pr_idea(idea);
-          pr(": (%d, %d) -> (%d,%d)",  x+1,y+1, new_x+1,new_y+1);
+          pr_idea(idea); pr(": (%d, %d) -> (%d,%d)",  x+1,y+1, new_x+1,new_y+1);
 
           // if neighbor-cell is empty, move there
           if (neighbor_idea.empty) {
@@ -37,18 +41,15 @@ void move_ideas(Idea field[][SIZE]) {
             field[y][x] = idea_empty();
           } else {
             printf("neighbor not empty, communicate with "); pr_idea(neighbor_idea);
-            printf("... -> ");
-            if (neighbor_idea.a > idea.a) {
+            prs("... -> ");
+            if (wins_over(neighbor_idea, idea)) {
               old[y][x] = neighbor_idea;
               field[y][x] = neighbor_idea;
 
-              pr_idea(neighbor_idea); prs("wins. result:");
-            } else if (idea.a > neighbor_idea.a) {
+            } else if (wins_over(idea, neighbor_idea)) {
               field[new_y][new_x] = idea;
               old[new_y][new_x] = idea;
-              pr_idea(idea); prs(" wins.");
             }
-
           }
           pr_field();
 
