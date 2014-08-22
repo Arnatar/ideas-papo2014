@@ -4,17 +4,6 @@
     pra(arr[i]);                  \
   }                               \
 
-// print array of ints
-#define pra(arr)                     \
-    printf("[ ");                    \
-    foreach(int *v, arr) {           \
-      if(*v > 0) {                   \
-      printf(COLOR "%d " RESET, *v); \
-      } else {                       \
-      printf("%d ", *v);             \
-      }                              \
-    }                                \
-    printf("]\ n");                  \
 
 #define sum(arr)             \
     ({                       \

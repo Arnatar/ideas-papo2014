@@ -38,10 +38,9 @@ new[9] = 37.037037
 
 int main(int argc, char ** argv){
 	MPI_Init(& argc, & argv);
-
 	int rank;
 	int size;
-
+  int comm = MPI_COMM_WORLD;
 	MPI_Comm_rank(MPI_COMM_WORLD, & rank);
 	MPI_Comm_size(MPI_COMM_WORLD, & size);
 
