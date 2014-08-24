@@ -42,7 +42,7 @@ void mpi() {
   mpi_define_idea_type();
 
   int row_amount_distribution[num_ranks];
-  get_distribution(row_amount_distribution, num_ranks, X_SIZE);
+  get_distribution(row_amount_distribution, num_ranks, Y_SIZE);
 
   int ideas_amount_distribution[num_ranks];
   get_distribution(ideas_amount_distribution, num_ranks, NUM_IDEAS);
@@ -50,6 +50,10 @@ void mpi() {
   // add space for ghost rows on top and bottom
   int num_rows = row_amount_distribution[rank] + 2;
   int num_ideas = ideas_amount_distribution[rank];
+
+  // rank wraparound
+	const int next_rank = rank == num_ranks - 1 ? 0 : rank + 1;
+	const int prev_rank = rank == 0 ? num_ranks -1 : rank - 1;
 
   srand(time(NULL)*rank);
 
@@ -59,17 +63,27 @@ void mpi() {
   // spawn ideas (the random y-value for field excludes the ghost rows
   for_every(i, num_ideas, field[rand_int(num_rows-2,1)][rand_int(X_SIZE,0)] = idea_new());
 
+  // fill all ghost rows
+  MPI_Request req, req2;
+
+  send_ideas(field[num_rows-2], next_rank, req);
+  send_ideas(field[1], prev_rank, req2);
+  receive_ideas_into(field[0], prev_rank, req);
+  receive_ideas_into(field[num_rows-1], next_rank, req);
+  barrier();
+
   // get filename for rank ("out/$rank")
   char fname[100];
   get_fname(fname, rank);
 
-  // rank wraparound
-	const int next_rank = rank == num_ranks - 1 ? 0 : rank + 1;
-	const int prev_rank = rank == 0 ? num_ranks -1 : rank - 1;
 
-
+  // movement ------------------------------------------------------------------
+  // serial: move all ideas which do not depend on other ranks. 
+  // then: 1) move all outer ideas from even ranks. 
+  //       1b) communicate to uneven ranks.
+  //       2) move all outer ideas from uneven ranks
+  //       2b) communicate to even ranks.
   // send ideas ----------------------------------------------------------------
-  MPI_Request req, req2;
   even_ranks(
     // send our last row into top ghost row of the next rank
     send_ideas(field[num_rows-2], next_rank, req);
