@@ -4,5 +4,3 @@ create_headers() {
 }
 
 create_headers lib/helpers
-create_headers logic
-create_headers idea

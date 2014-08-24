@@ -26,6 +26,14 @@ void pre() {
 }
 
 
-
-
+void prf(char* fname) {
+  int c;
+  FILE *file;
+  file = fopen(fname, "r");
+  if (file) {
+      while ((c = getc(file)) != EOF)
+          putchar(c);
+      fclose(file);
+  }
+}
 

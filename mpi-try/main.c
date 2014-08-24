@@ -6,6 +6,10 @@
 
 #define P99_PROTECT(...) __VA_ARGS__ 
 
+void get_fname(char* fname, int rank) {
+  sprintf(fname, "out/%d", rank);
+}
+
 void get_distribution(int distribution[], int nranks, int global_amount) {
   int base_amount = global_amount / nranks;
   int rest_amount = global_amount % nranks;
@@ -53,7 +57,30 @@ void mpi() {
   // spawn ideas (the random y-value for field excludes the ghost rows
   for_every(i, num_ideas, field[rand_int(num_rows-2,1)][rand_int(SIZE,0)] = idea_new());
 
-  printf("[%d] %d rows, %d ideas. \n", rank, num_rows-2, num_ideas);
+  // char* fname = 
+  // with
+  // printf("[%d] %d rows, %d ideas. \n", rank, num_rows-2, num_ideas);
+
+  // get filename for rank ("out/$rank")
+  char fname[100];
+  get_fname(fname, rank);
+
+  with_file(fname, {
+    write_field();
+  });
+
+
+  // print outputs in numeric order
+  barrier();
+  master(
+    for_every(i, num_ranks, {
+      get_fname(fname, i);
+      prf(fname);
+      pre();
+    });
+  );
+
+
   // pr_field();
 
   // move_ideas(field);
@@ -107,11 +134,12 @@ void mpi() {
 //   return "[" + "]"; 
 
 
+
 int main() {
   pre();
   mpi();
   // int num_ranks = 4;
-  // int rank=4;
+  // int rank=;
   // int row_amount_distribution[num_ranks];
   // get_distribution(row_amount_distribution, num_ranks, SIZE);
 
@@ -127,7 +155,14 @@ int main() {
   // start_simulation();
 
   // pri(base_amount);
-  // pri(rest_amount);
+
+  // char* fname="text.txt";
+  // with_file(fname, {
+  //     write("test");
+  // });
+
+
+
 
 
 
