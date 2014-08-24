@@ -1,3 +1,6 @@
+### dependencies
+- see `Dockerfile`, or install docker and [fig](fig.sh/install.html) and run `fig run main bash`.
+
 ### run
 `make` from repo root
 
