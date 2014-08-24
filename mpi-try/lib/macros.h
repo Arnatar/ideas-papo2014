@@ -24,7 +24,7 @@
     printf("]\n");                  \
   
 
-  // print array of ideas
+// print array of ideas
 #define pr_field(num_rows)                                     \
     for(int i=0; i<num_rows; i++) {                        \
       for(int j=0; j<SIZE; j++) {                      \
