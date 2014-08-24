@@ -25,8 +25,8 @@
   
 
   // print array of ideas
-#define pr_field()                                     \
-    for(int i=0; i<SIZE; i++) {                        \
+#define pr_field(num_rows)                                     \
+    for(int i=0; i<num_rows; i++) {                        \
       for(int j=0; j<SIZE; j++) {                      \
         Idea idea = field[i][j];                      \
         if (!idea.empty) {                            \
@@ -47,8 +47,8 @@
 #define pr(...) printf(__VA_ARGS__); printf("\n")
 
 
-#define fill_matrix_with(arr, fill) \
-  for(int y=0; y<SIZE; y++) {       \
+#define fill_matrix_with(arr, rows, fill) \
+  for(int y=0; y<rows; y++) {       \
     for(int x=0; x<SIZE; x++) {     \
       arr[y][x] = fill;             \
     }                               \

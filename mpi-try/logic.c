@@ -51,7 +51,7 @@ void move_ideas(Idea field[][SIZE]) {
               old[new_y][new_x] = idea;
             }
           }
-          pr_field();
+          // pr_field();
 
         }
       }
