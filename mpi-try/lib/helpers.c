@@ -26,7 +26,7 @@ void pre() {
 }
 
 
-void prf(char* fname) {
+void prfile(char* fname) {
   int c;
   FILE *file;
   file = fopen(fname, "r");

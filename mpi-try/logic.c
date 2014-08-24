@@ -8,12 +8,12 @@ int wins_over(Idea i1, Idea i2) {
   return first_wins;
 }
 
-void move_ideas(Idea field[][SIZE]) {
-  Idea old[SIZE][SIZE];
+void move_ideas(Idea field[][X_SIZE]) {
+  Idea old[X_SIZE][X_SIZE];
   copy(field,old);
 
-  for(int y=0; y<SIZE; y++) {
-    for(int x=0; x<SIZE; x++) {
+  for(int y=0; y<X_SIZE; y++) {
+    for(int x=0; x<X_SIZE; x++) {
 
       Idea idea = old[y][x]; 
 
@@ -28,8 +28,8 @@ void move_ideas(Idea field[][SIZE]) {
 
           int new_x = x+move_x;
           int new_y = y+move_y;
-          new_x = new_x == SIZE ? 0 : new_x == -1 ? SIZE-1 : new_x;
-          new_y = new_y == SIZE ? 0 : new_y == -1 ? SIZE-1 : new_y;
+          new_x = new_x == X_SIZE ? 0 : new_x == -1 ? X_SIZE-1 : new_x;
+          new_y = new_y == X_SIZE ? 0 : new_y == -1 ? X_SIZE-1 : new_y;
           Idea neighbor_idea = field[new_y][new_x];
 
           pr_idea(idea); pr(": (%d, %d) -> (%d,%d)",  x+1,y+1, new_x+1,new_y+1);

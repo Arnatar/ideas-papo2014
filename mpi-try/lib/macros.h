@@ -32,7 +32,7 @@
 
 #define fill_matrix_with(arr, rows, fill) \
   for(int y=0; y<rows; y++) {       \
-    for(int x=0; x<SIZE; x++) {     \
+    for(int x=0; x<X_SIZE; x++) {     \
       arr[y][x] = fill;             \
     }                               \
   }                                 \
@@ -60,6 +60,12 @@ for(int x=0; x<size; x++) {            \
 #define send(idea, to, req) \
   MPI_Isend(&idea, 1, mpi_idea_type, to, to, MPI_COMM_WORLD, &req) 
 
+#define send_ideas(ideas_arr, to, req) \
+  MPI_Isend(ideas_arr, X_SIZE, mpi_idea_type, to, to, MPI_COMM_WORLD, &req) 
+
+#define receive_ideas_into(ideas_arr, from, req) \
+  MPI_Irecv(ideas_arr, X_SIZE, mpi_idea_type, from, rank, MPI_COMM_WORLD, &req) 
+
 #define receive_into(buf, from, req) \
   MPI_Irecv(&buf, 1, mpi_idea_type, from, rank, MPI_COMM_WORLD, &req) 
 
@@ -82,6 +88,8 @@ for(int x=0; x<size; x++) {            \
 
 #define master(f) if (rank == 0) { f; }
 #define worker(f) if (rank != 0) { f; }
+#define even_ranks(f) if (rank % 2 == 0) { f; }
+#define uneven_ranks(f) if (rank % 2 != 0) { f; }
 
 
 
@@ -98,7 +106,7 @@ for(int x=0; x<size; x++) {            \
 // print array of ideas
 #define pr_field(num_rows)                                     \
     for(int i=0; i<num_rows; i++) {                        \
-      for(int j=0; j<SIZE; j++) {                      \
+      for(int j=0; j<X_SIZE; j++) {                      \
         Idea idea = field[i][j];                      \
         if (!idea.empty) {                            \
           printf(COLOR); pr_idea(idea); printf(RESET); \
@@ -116,7 +124,7 @@ for(int x=0; x<size; x++) {            \
 // print array of ideas
 #define write_field()                                     \
     for(int i=0; i<num_rows; i++) {                        \
-      for(int j=0; j<SIZE; j++) {                      \
+      for(int j=0; j<X_SIZE; j++) {                      \
         Idea idea = field[i][j];                      \
         if (!idea.empty) {                            \
           write(COLOR); write_idea(idea); write(RESET); \
@@ -127,3 +135,5 @@ for(int x=0; x<size; x++) {            \
       write_newline();                                           \
     }                                                  \
     /* write_newline(); */                                           
+
+

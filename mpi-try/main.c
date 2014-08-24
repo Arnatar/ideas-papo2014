@@ -36,10 +36,13 @@ int start_simulation(int num_rows, int num_ideas) {
 
 void mpi() {
   mpi_init(); // rank, num_ranks
+
+
+  // initializations -----------------------------------------------------------
   mpi_define_idea_type();
 
   int row_amount_distribution[num_ranks];
-  get_distribution(row_amount_distribution, num_ranks, SIZE);
+  get_distribution(row_amount_distribution, num_ranks, X_SIZE);
 
   int ideas_amount_distribution[num_ranks];
   get_distribution(ideas_amount_distribution, num_ranks, NUM_IDEAS);
@@ -50,35 +53,55 @@ void mpi() {
 
   srand(time(NULL)*rank);
 
-
-  Idea field[num_rows][SIZE];
+  Idea field[num_rows][X_SIZE];
   fill_matrix_with(field, num_rows, idea_empty());
 
   // spawn ideas (the random y-value for field excludes the ghost rows
-  for_every(i, num_ideas, field[rand_int(num_rows-2,1)][rand_int(SIZE,0)] = idea_new());
-
-  // char* fname = 
-  // with
-  // printf("[%d] %d rows, %d ideas. \n", rank, num_rows-2, num_ideas);
+  for_every(i, num_ideas, field[rand_int(num_rows-2,1)][rand_int(X_SIZE,0)] = idea_new());
 
   // get filename for rank ("out/$rank")
   char fname[100];
   get_fname(fname, rank);
 
+  // rank wraparound
+	const int next_rank = rank == num_ranks - 1 ? 0 : rank + 1;
+	const int prev_rank = rank == 0 ? num_ranks -1 : rank - 1;
+
+
+  // send ideas ----------------------------------------------------------------
+  MPI_Request req, req2;
+  even_ranks(
+    // send our last row into top ghost row of the next rank
+    send_ideas(field[num_rows-2], next_rank, req);
+    // send our first row into the bottom ghost row of the previous rank
+    send_ideas(field[1], prev_rank, req2);
+  );
+
+  uneven_ranks(
+    // receive last row from previous rank into our top ghost row
+    receive_ideas_into(field[0], prev_rank, req);
+    // receive first row from next rank into our bottom ghost row
+    receive_ideas_into(field[num_rows-1], next_rank, req);
+  );
+  barrier();
+
+  // print out -----------------------------------------------------------------
   with_file(fname, {
     write_field();
   });
 
-
   // print outputs in numeric order
+  // ---------------------------------------------------------------------------
   barrier();
+
   master(
     for_every(i, num_ranks, {
       get_fname(fname, i);
-      prf(fname);
+      prfile(fname);
       pre();
     });
   );
+
 
 
   // pr_field();
@@ -138,10 +161,11 @@ void mpi() {
 int main() {
   pre();
   mpi();
+  // pri(4 % 2);
   // int num_ranks = 4;
   // int rank=;
   // int row_amount_distribution[num_ranks];
-  // get_distribution(row_amount_distribution, num_ranks, SIZE);
+  // get_distribution(row_amount_distribution, num_ranks, X_SIZE);
 
   // int ideas_amount_distribution[num_ranks];
   // get_distribution(ideas_amount_distribution, num_ranks, NUM_IDEAS);
