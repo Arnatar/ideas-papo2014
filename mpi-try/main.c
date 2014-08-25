@@ -37,6 +37,11 @@ int start_simulation(int num_rows, int num_ideas) {
 void mpi() {
   mpi_init(); // rank, num_ranks
 
+  if (num_ranks % 2 != 0) {
+    master(fputs("Use an even amount of processes for now.\n\n", stderr));
+    exit(-1);
+  }
+
 
   // if (Y_SIZE / num_ranks
   // initializations -----------------------------------------------------------
@@ -65,10 +70,9 @@ void mpi() {
   for_every(i, num_ideas, field[rand_int(num_rows-2,1)][rand_int(X_SIZE,0)] = idea_new());
 
   // fill all ghost rows
-  MPI_Request req, req2;
-
-  send_border_rows();
-  receive_border_rows();
+  MPI_Request req, req2, req3, req4;
+  send_real_rows_to_ghost_rows();
+  receive_real_rows_into_ghost_rows();
 
   barrier();
 
@@ -77,6 +81,8 @@ void mpi() {
   get_fname(fname, rank);
   FILE *fp;
 
+  // for now: manual control over simulation
+  int t=0;
 
   // movement ------------------------------------------------------------------
   // serial: move all ideas which do not depend on other ranks. 
@@ -86,17 +92,56 @@ void mpi() {
   //       2b) communicate to even ranks.
   // send ideas ----------------------------------------------------------------
 
-  pr_field();
 
   // INDEPENDENT MOVEMENT
-  if (num_rows > 6) {
+  // reason for 7: 1 row in center, can move up or down without touching a dependent
+  // row. from the outer sides: 1 ghost row, 2 dependent rows each = 3*2. the next
+  // row above 6 is the first independent row. 
+  // [2]: give the independent movement procedure all rows starting from the 
+  //      third, until the third last. if num_rows = 8, num_rows-4 = 4. that means:
+  // take 3 rows from the array (the for loop is not inclusive).
+  // so for a matrix with 8 rows we take (0-based) rows 2,3,4,5. 0+1 and 6+7 are 
+  // left out.
+  if (num_rows >= 7) {
     move_ideas(field[2], num_rows - 4, rank);
   }
 
-  // barrier();
-  // printf("rank %d: %d %d %d\n", rank, field[3][0].a, field[3][0].b, field[3][0].c);
-  pr_logs();
+  // pr_logs();
   pr_field();
+
+  for(int l=0; l<2; l++) {
+    if (rank % 2 == l) {
+        move_dependent_rows();
+        send_rows();
+    } else {
+        receive_rows();
+    }
+    barrier();
+
+    master(pre();pre(););
+    // this displays the bottom dependent row movements only for now!
+    pr_specific_logs(l);
+    pr_field();
+  }
+
+
+  // uneven_ranks(
+  //   // move the top dependent rows
+  //   move_ideas(field[0], 3, rank); 
+  //   // move the bottom dependent rows
+  //   move_ideas(field[num_rows-3], 3, rank);
+
+  //   send_real_rows_to_ghost_rows();
+  //   send_ghost_rows_to_real_rows();
+  // );
+
+  // even_ranks(
+  //   receive_real_rows_into_ghost_rows();
+  //   receive_ghost_rows_into_real_rows();
+  // );
+
+  // barrier();
+  // pr_field();
 
 
 
@@ -168,6 +213,10 @@ void mpi() {
 int main() {
   pre();
   mpi();
+  // for(int l=0; l<2; l++) {
+    // pri(l);
+  // }
+  // delete_logs();
   // pri(4 % 2);
   // int num_ranks = 4;
   // int rank=;
