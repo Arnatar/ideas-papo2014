@@ -38,6 +38,7 @@ void mpi() {
   mpi_init(); // rank, num_ranks
 
 
+  // if (Y_SIZE / num_ranks
   // initializations -----------------------------------------------------------
   mpi_define_idea_type();
 
@@ -55,7 +56,7 @@ void mpi() {
 	const int next_rank = rank == num_ranks - 1 ? 0 : rank + 1;
 	const int prev_rank = rank == 0 ? num_ranks -1 : rank - 1;
 
-  srand(time(NULL)*rank);
+  srand(time(NULL)+rank);
 
   Idea field[num_rows][X_SIZE];
   fill_matrix_with(field, num_rows, idea_empty());
@@ -66,15 +67,15 @@ void mpi() {
   // fill all ghost rows
   MPI_Request req, req2;
 
-  send_ideas(field[num_rows-2], next_rank, req);
-  send_ideas(field[1], prev_rank, req2);
-  receive_ideas_into(field[0], prev_rank, req);
-  receive_ideas_into(field[num_rows-1], next_rank, req);
+  send_border_rows();
+  receive_border_rows();
+
   barrier();
 
   // get filename for rank ("out/$rank")
   char fname[100];
   get_fname(fname, rank);
+  FILE *fp;
 
 
   // movement ------------------------------------------------------------------
@@ -84,37 +85,29 @@ void mpi() {
   //       2) move all outer ideas from uneven ranks
   //       2b) communicate to even ranks.
   // send ideas ----------------------------------------------------------------
-  even_ranks(
-    // send our last row into top ghost row of the next rank
-    send_ideas(field[num_rows-2], next_rank, req);
-    // send our first row into the bottom ghost row of the previous rank
-    send_ideas(field[1], prev_rank, req2);
-  );
 
-  uneven_ranks(
-    // receive last row from previous rank into our top ghost row
-    receive_ideas_into(field[0], prev_rank, req);
-    // receive first row from next rank into our bottom ghost row
-    receive_ideas_into(field[num_rows-1], next_rank, req);
-  );
-  barrier();
+  pr_field();
+
+  // INDEPENDENT MOVEMENT
+  if (num_rows > 6) {
+    move_ideas(field[2], num_rows - 4, rank);
+  }
+
+  // barrier();
+  // printf("rank %d: %d %d %d\n", rank, field[3][0].a, field[3][0].b, field[3][0].c);
+  pr_logs();
+  pr_field();
+
+
+
+  // master(prs("-----------"));
+  // pr_field();
+
+  // even_ranks(send_border_rows());
+  // uneven_ranks(receive_border_rows());
+
 
   // print out -----------------------------------------------------------------
-  with_file(fname, {
-    write_field();
-  });
-
-  // print outputs in numeric order
-  // ---------------------------------------------------------------------------
-  barrier();
-
-  master(
-    for_every(i, num_ranks, {
-      get_fname(fname, i);
-      prfile(fname);
-      pre();
-    });
-  );
 
 
 

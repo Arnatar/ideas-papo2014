@@ -37,3 +37,6 @@ void prfile(char* fname) {
   }
 }
 
+void get_log_fname(char* fname, int rank) {
+  sprintf(fname, "log/%d", rank);
+}

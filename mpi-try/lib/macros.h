@@ -7,7 +7,6 @@
 #define for_every(i, size, f) for(int i=0; i<size; i++) { f; }
 
 #define with_file(f, action) \
-  FILE *fp; \
   fp=fopen(f, "w"); \
   action \
   fclose(fp);
@@ -103,37 +102,75 @@ for(int x=0; x<size; x++) {            \
 
 
 
-// print array of ideas
-#define pr_field(num_rows)                                     \
-    for(int i=0; i<num_rows; i++) {                        \
-      for(int j=0; j<X_SIZE; j++) {                      \
-        Idea idea = field[i][j];                      \
-        if (!idea.empty) {                            \
-          printf(COLOR); pr_idea(idea); printf(RESET); \
-        } else {                                       \
-          pr_idea(idea);                               \
-        }                                              \
-      }                                                \
-      pre();                                           \
-    }                                                  \
-    pre();                                             \
+/* // print array of ideas */
+/* #define pr_field(num_rows)                                     \ */
+/*     for(int i=0; i<num_rows; i++) {                        \ */
+/*       for(int j=0; j<X_SIZE; j++) {                      \ */
+/*         Idea idea = field[i][j];                      \ */
+/*         if (!idea.empty) {                            \ */
+/*           printf(COLOR); pr_idea(idea); printf(RESET); \ */
+/*         } else {                                       \ */
+/*           pr_idea(idea);                               \ */
+/*         }                                              \ */
+/*       }                                                \ */
+/*       pre();                                           \ */
+/*     }                                                  \ */
+/*     pre();                                             \ */
 
 #define write_idea(idea)                             \
   write("(%d,%d,%d) ",idea.a, idea.b, idea.c) \
 
 // print array of ideas
-#define write_field()                                     \
-    for(int i=0; i<num_rows; i++) {                        \
-      for(int j=0; j<X_SIZE; j++) {                      \
-        Idea idea = field[i][j];                      \
-        if (!idea.empty) {                            \
+#define write_field()                                   \
+    for(int i=0; i<num_rows; i++) {                     \
+      for(int j=0; j<X_SIZE; j++) {                     \
+        Idea idea = field[i][j];                        \
+        if (!idea.empty) {                              \
           write(COLOR); write_idea(idea); write(RESET); \
-        } else {                                       \
-          write_idea(idea);                               \
-        }                                              \
-      }                                                \
-      write_newline();                                           \
-    }                                                  \
+        } else {                                        \
+          write_idea(idea);                             \
+        }                                               \
+      }                                                 \
+      write_newline();                                  \
+    }                                                   \
     /* write_newline(); */                                           
 
+
+#define send_border_rows()                                                \
+  /* send our last row into top ghost row of the next rank */             \
+  send_ideas(field[num_rows-2], next_rank, req);                          \
+  /* send our first row into the bottom ghost row of the previous rank */ \
+  send_ideas(field[1], prev_rank, req2); 
+
+#define receive_border_rows()                                      \
+  /* receive last row from previous rank into our top ghost row */ \
+  receive_ideas_into(field[0], prev_rank, req);                    \
+  /* receive first row from next rank into our bottom ghost row */ \
+  receive_ideas_into(field[num_rows-1], next_rank, req);           \
+
+#define pr_field()            \
+  barrier();                  \
+  get_fname(fname, rank);     \
+  with_file(fname, {          \
+    write_field();            \
+  });                         \
+  barrier();                  \
+  master(                     \
+    for_every(i, num_ranks, { \
+      get_fname(fname, i);    \
+      prfile(fname);          \
+      pre();                  \
+    });                       \
+  );                          
+
+#define pr_logs() \
+  barrier(); \
+  master(                     \
+    for_every(i, num_ranks, { \
+      pr("[%d] ================================\n", i); \
+      get_log_fname(fname, i);    \
+      prfile(fname);          \
+      pre();                  \
+    });                       \
+  );                          
 

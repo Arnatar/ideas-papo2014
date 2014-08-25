@@ -12,6 +12,6 @@ num_threads=2
 	# cd $(folder) && mpicc -std=c99 $(f) && mpirun -np $(num_threads) ./a.out | sort -n
 
 all:
-	cd $(folder) && mpicc -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(num_threads) ./a.out $(args)
+	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(num_threads) ./a.out $(args)
 
 
