@@ -23,6 +23,9 @@ void mpi() {
   // initializations -----------------------------------------------------------
   mpi_define_idea_type();
 
+  init_time_measurement_variables();
+
+
   int row_amount_distribution[num_ranks];
   get_distribution(row_amount_distribution, num_ranks, Y_SIZE);
 
@@ -39,17 +42,27 @@ void mpi() {
 
   srand(time(NULL)+rank);
 
+  tic();
+
   Idea field[num_rows][X_SIZE];
   fill_matrix_with(field, num_rows, idea_empty());
 
+  toc("fill field with zero ideas");
+
+
+  tic();
   // spawn ideas (the random y-value for field excludes the ghost rows
   for_every(i, num_ideas, 
       field[rand_int(num_rows-2,1)][rand_int(X_SIZE,0)] = idea_new());
 
+  toc("fill with random ideas");
+
   // fill all ghost rows
   MPI_Request req, req2, req3, req4;
+  tic();
   send_real_rows_to_ghost_rows();
   receive_real_rows_into_ghost_rows();
+  toc("sending to ghost rows");
 
   barrier();
 
@@ -58,6 +71,9 @@ void mpi() {
   get_fname(fname, rank);
   FILE *fp;
 
+
+#define ROUNDS 3
+  for_every(i, ROUNDS, {
   tic();
   // movement ------------------------------------------------------------------
   // serial: move all ideas which do not depend on other ranks. 
@@ -84,6 +100,7 @@ void mpi() {
   pr_field();
 
 
+  // DEPENDENT MOVEMENT: first move+send from even ranks, then from uneven ranks
   for(int l=0; l<2; l++) {
     if (rank % 2 == l) {
         move_dependent_rows();
@@ -93,13 +110,14 @@ void mpi() {
     }
     barrier();
 
-    master(pre();pre(););
+    // master(pre();pre(););
     // this displays the bottom dependent row movements only for now!
     pr_specific_logs(l);
     pr_field();
   }
 
-  toc();
+  toc("moving + communicating");
+  });
 
   MPI_Type_free(&mpi_idea_type);
   MPI_Finalize();

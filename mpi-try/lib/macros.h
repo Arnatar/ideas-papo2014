@@ -230,18 +230,22 @@ for(int x=0; x<size; x++) {            \
 
 
 // measure ---------------------------------------------------------------------
+#define init_time_measurement_variables() \
+  struct timeval start_time;              \
+  struct timeval end_time;                \
+  double start_dtime, end_dtime, diff;
 
-#define tic()                                                                        \
-  struct timeval start_time;                                                         \
-  struct timeval end_time;                                                           \
-  gettimeofday(&start_time,NULL);                                                    \
-  double start_dtime=(double)start_time.tv_sec+(double)start_time.tv_usec/1000000.0; \
+#define tic()                                                                 \
+  gettimeofday(&start_time,NULL);                                             \
+  start_dtime=(double)start_time.tv_sec+(double)start_time.tv_usec/1000000.0; \
 
 
 
-#define toc()                                                                  \
-  gettimeofday(&end_time,NULL);                                                \
-  double end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
-  double diff=end_dtime-start_dtime;                                           \
-  master(pr("%f seconds.", diff));
+#define toc(description)                                                           \
+  gettimeofday(&end_time,NULL);                                         \
+  end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
+  diff=end_dtime-start_dtime;                                           \
+  master(pr("%s: %f seconds.", description, diff));
+
+
 
