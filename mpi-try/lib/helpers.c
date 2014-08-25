@@ -40,3 +40,8 @@ void prfile(char* fname) {
 void get_log_fname(char* fname, int rank) {
   sprintf(fname, "log/%d", rank);
 }
+
+
+void get_fname(char* fname, int rank) {
+  sprintf(fname, "out/%d", rank);
+}

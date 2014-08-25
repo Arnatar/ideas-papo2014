@@ -1,9 +1,11 @@
+// #define DEBUG
 #include <stdlib.h>
 #include <stdio.h>
 #define COLOR    "\x1b[32m"
 #define RESET   "\x1b[0m"
 
 // GENERAL ---------------------------------------------------------------------
+
 #define for_every(i, size, f) for(int i=0; i<size; i++) { f; }
 
 #define with_file(f, action) \
@@ -11,7 +13,6 @@
   action \
   fclose(fp);
 
-#define write(...) fprintf(fp, __VA_ARGS__)
 
 #define write_newline(...) fprintf(fp, "\n")
 
@@ -91,31 +92,15 @@ for(int x=0; x<size; x++) {            \
 #define uneven_ranks(f) if (rank % 2 != 0) { f; }
 
 
+// OUTPUT
 
-// PROGRAM LOGIC ---------------------------------------------------------------
-#define Rank(n) n
-#define Master 0
-
-
-#define pr_idea(idea)                             \
-  printf("(%d,%d,%d) ",idea.a, idea.b, idea.c) \
+// #define pr_idea(idea)                             \
+//   printf("(%d,%d,%d) ",idea.a, idea.b, idea.c) \
 
 
+#ifdef DEBUG
 
-/* // print array of ideas */
-/* #define pr_field(num_rows)                                     \ */
-/*     for(int i=0; i<num_rows; i++) {                        \ */
-/*       for(int j=0; j<X_SIZE; j++) {                      \ */
-/*         Idea idea = field[i][j];                      \ */
-/*         if (!idea.empty) {                            \ */
-/*           printf(COLOR); pr_idea(idea); printf(RESET); \ */
-/*         } else {                                       \ */
-/*           pr_idea(idea);                               \ */
-/*         }                                              \ */
-/*       }                                                \ */
-/*       pre();                                           \ */
-/*     }                                                  \ */
-/*     pre();                                             \ */
+#define write(...) fprintf(fp, __VA_ARGS__)
 
 #define write_idea(idea)                             \
   write("(%d,%d,%d) ",idea.a, idea.b, idea.c) \
@@ -133,35 +118,6 @@ for(int x=0; x<size; x++) {            \
       }                                                 \
       write_newline();                                  \
     }                                                   \
-    /* write_newline(); */                                           
-
-// these tags define the semantics of the *sender's* message content
-#define GHOST 7777
-#define REAL 6666
-
-#define send_real_rows_to_ghost_rows() \
-  /* send our last real row into top ghost row of the next rank */             \
-  send_ideas(field[num_rows-2], next_rank, REAL, req);                         \
-  /* send our first real row into the bottom ghost row of the previous rank */ \
-  send_ideas(field[1], prev_rank, REAL, req2);                                 \
-
-#define send_ghost_rows_to_real_rows()                                         \
-  /* send our first ghost row into the bottom real row of the previous rank */ \
-  send_ideas(field[0], next_rank, GHOST, req3);                                \
-  /* send our last ghost row into the top real row of the next rank */         \
-  send_ideas(field[num_rows-1], next_rank, GHOST, req4);                       \
-
-#define receive_real_rows_into_ghost_rows()                             \
-  /* receive last real row from previous rank into our top ghost row */ \
-  receive_ideas_into(field[0], prev_rank, REAL, req);                   \
-  /* receive first real row from next rank into our bottom ghost row */ \
-  receive_ideas_into(field[num_rows-1], next_rank, REAL, req2);         \
-
-#define receive_ghost_rows_into_real_rows()                             \
-  /* receive first ghost row from next rank into our bottom real row */ \
-  receive_ideas_into(field[num_rows-2], next_rank, GHOST, req3);        \
-  /* receive last ghost row from prev rank into our top real row */     \
-  receive_ideas_into(field[1], prev_rank, GHOST, req4);                 \
 
 #define pr_field()            \
   barrier();                  \
@@ -177,9 +133,6 @@ for(int x=0; x<size; x++) {            \
       pre();                  \
     });                       \
   );                          
-
-#define delete_logs() \
-  system("exec rm -r /code/mpi-try/log/*")
 
 #define pr_logs() \
   barrier(); \
@@ -209,8 +162,61 @@ for(int x=0; x<size; x++) {            \
   );                          
 
 
-#define move_dependent_rows()             \
-  move_ideas(field[0], 3, rank);          \
+#define open_logfile_for_writing() \
+  char log_fname[100];             \
+  get_log_fname(log_fname, rank);  \
+  FILE *fp;                        \
+  fp=fopen(log_fname, "w");        \
+
+#define close_logfile() \
+  fclose(fp);
+
+#else
+#define write(...)
+#define write_idea(...)
+#define write_field()
+#define pr_field()
+#define pr_logs()
+#define pr_specific_logs(...)
+
+#define open_logfile_for_writing()
+#define close_logfile();
+#endif
+// PROGRAM LOGIC ---------------------------------------------------------------
+#define Rank(n) n
+#define Master 0
+
+// these tags define the semantics of the *sender's* message content
+#define GHOST 7777
+#define REAL 6666
+
+#define send_real_rows_to_ghost_rows() \
+  /* send our last real row into top ghost row of the next rank */             \
+  send_ideas(field[num_rows-2], next_rank, REAL, req);                         \
+  /* send our first real row into the bottom ghost row of the previous rank */ \
+  send_ideas(field[1], prev_rank, REAL, req2);                                 \
+
+#define send_ghost_rows_to_real_rows()                                         \
+  /* send our first ghost row into the bottom real row of the previous rank */ \
+  send_ideas(field[0], next_rank, GHOST, req3);                                \
+  /* send our last ghost row into the top real row of the next rank */         \
+  send_ideas(field[num_rows-1], next_rank, GHOST, req4);                       \
+
+#define receive_real_rows_into_ghost_rows()                             \
+  /* receive last real row from previous rank into our top ghost row */ \
+  receive_ideas_into(field[0], prev_rank, REAL, req);                   \
+  /* receive first real row from next rank into our bottom ghost row */ \
+  receive_ideas_into(field[num_rows-1], next_rank, REAL, req2);         \
+
+#define receive_ghost_rows_into_real_rows()                             \
+  /* receive first ghost row from next rank into our bottom real row */ \
+  receive_ideas_into(field[num_rows-2], next_rank, GHOST, req3);        \
+  /* receive last ghost row from prev rank into our top real row */     \
+  receive_ideas_into(field[1], prev_rank, GHOST, req4);                 \
+
+
+#define move_dependent_rows()    \
+  move_ideas(field[0], 3, rank); \
   move_ideas(field[num_rows-3], 3, rank); 
 
 #define send_rows()               \
@@ -220,3 +226,22 @@ for(int x=0; x<size; x++) {            \
 #define receive_rows()                 \
   receive_real_rows_into_ghost_rows(); \
   receive_ghost_rows_into_real_rows();
+
+
+
+// measure ---------------------------------------------------------------------
+
+#define tic()                                                                        \
+  struct timeval start_time;                                                         \
+  struct timeval end_time;                                                           \
+  gettimeofday(&start_time,NULL);                                                    \
+  double start_dtime=(double)start_time.tv_sec+(double)start_time.tv_usec/1000000.0; \
+
+
+
+#define toc()                                                                  \
+  gettimeofday(&end_time,NULL);                                                \
+  double end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
+  double diff=end_dtime-start_dtime;                                           \
+  master(pr("%f seconds.", diff));
+

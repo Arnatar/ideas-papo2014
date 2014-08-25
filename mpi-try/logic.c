@@ -12,12 +12,8 @@ void move_ideas(Idea field[][X_SIZE], int rows, int rank) {
   Idea old[rows][X_SIZE];
   copy(field,old);
 
-  // open our rank log file for logging
-  char log_fname[100];
-  get_log_fname(log_fname, rank);
-  FILE *fp;
-  fp=fopen(log_fname, "w"); 
 
+  open_logfile_for_writing();
   for(int y=1; y<rows-1; y++) {
     for(int x=0; x<X_SIZE; x++) {
 
@@ -67,7 +63,7 @@ void move_ideas(Idea field[][X_SIZE], int rows, int rank) {
       }
     }
   }
-  fclose(fp);
+  close_logfile();
 
 }
 
