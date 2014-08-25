@@ -10,8 +10,10 @@
 
 
 ### code structure
-- ich weiß momentan nicht, wie ich MPI funktionen in externe Funktionen auslagern kann,
-da dann der MPI-Datatype `idea`, den ich erstellt habe, nicht mehr sichtbar ist. Daher ist jetzt gerade alles wesentliche in `main.c`. `logic.c` ist aus dem seriellen Ansatz. 
-
-
-
+- main.c is der startpunkt, logischerweise ;). 
+- logic.c enthaelt die logik zum bewegen und kommunizieren der ideen 
+- idea.c enthaelt die definition des struct idea und die konstruktoren.
+- lib/helpers.c enthaelt ein par helper funktionen...;)
+- lib/macros.h enthaelt gerade ziemlich viel, koennte/sollte man noch aufsplitten
+- allheads.h enthaelt header, die in jeder source file verfügbar sind.
+- constants.h enthaelt konstanten hahaha. 

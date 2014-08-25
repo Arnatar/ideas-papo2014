@@ -12,8 +12,8 @@ void move_ideas(Idea field[][X_SIZE], int rows, int rank) {
   Idea old[rows][X_SIZE];
   copy(field,old);
 
-
   open_logfile_for_writing();
+
   for(int y=1; y<rows-1; y++) {
     for(int x=0; x<X_SIZE; x++) {
 
