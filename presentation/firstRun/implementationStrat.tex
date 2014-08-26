@@ -1,18 +1,21 @@
 \section{Plan zur algorithmischen Umsetzung}
+\subsection{Aufbau}
 \begin{frame}{Ideen zum Aufbau}
 	\begin{itemize}[<+->]
+		\item Mensch modelliert durch struct mit 2 Feldern
 		\item Idee modelliert durch struct mit 3 Feldern
 		\item Welt modelliert durch 2D-Gitter
-		\item Mensch modelliert durch Pointer auf eine nicht-leere Idee auf dem Gitter
-		\item Rundenbasiert
+		\item "Rundenbasiert"
 		\item Menschen ziehen jede Runde ein Feld
 		\item Jede Runde wird jeder Mensch versuchen seine Idee zu kommunizieren
 	\end{itemize}		
 \end{frame}
 
-\begin{frame}{Genaueres}
+\subsection{Parallelisierung}
+\begin{frame}{Parallelisierung}
 	\begin{itemize}[<+->]
-		\item Implementation der Zusammenhänge (Siehe Projektidee)
-		\item Qualität legt den Wertebereich der Komplexität fest.
+		\item Die Welt wird in verschiedene grids aufgespalten
+		\item Jeder Prozess bearbeitet ein grid
+		\item Zwischen den Prozessen wird ein Element geteilt, wenn es in den Randbereich läuft
 	\end{itemize}
 \end{frame}
