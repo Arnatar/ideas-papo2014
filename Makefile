@@ -14,3 +14,7 @@ procs=4
 all:
 	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(procs) ./a.out $(args)
 
+slurm:
+	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
+
+

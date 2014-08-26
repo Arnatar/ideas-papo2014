@@ -149,26 +149,9 @@ void mpi() {
   MPI_Finalize();
 }
 
-typedef struct {
-    int i;
-} test;
 
 int main() {
   mpi();
-
-
-
-
-
-  pre();
-
-
-
-
-
-
-
-
 
 }
 
