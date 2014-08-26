@@ -53,7 +53,7 @@ for(int x=0; x<size; x++) {            \
   offsets[0] = offsetof(Idea, a);                                            \
   offsets[1] = offsetof(Idea, b);                                            \
   offsets[2] = offsetof(Idea, c);                                            \
-  offsets[3] = offsetof(Idea, hs);                                            \
+  offsets[3] = offsetof(Idea, h);                                            \
   offsets[4] = offsetof(Idea, empty);                                        \
     MPI_Type_create_struct(4, blocklengths, offsets, types, &mpi_idea_type); \
     MPI_Type_commit(&mpi_idea_type);                                         \
