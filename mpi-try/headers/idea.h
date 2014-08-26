@@ -1,7 +1,7 @@
 /* idea.c */
 
 typedef struct {
-  int a, b, c,empty;
+  int a, b, c, h, empty;
 } Idea;
 
 Idea idea_new(void);

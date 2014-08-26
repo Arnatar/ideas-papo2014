@@ -46,14 +46,15 @@ for(int x=0; x<size; x++) {            \
 // MPI -------------------------------------------------------------------------
 
 #define mpi_define_idea_type()                                               \
-  int          blocklengths[4] = {1,1,1,1};                                  \
-  MPI_Datatype types[4] = {MPI_INT,MPI_INT, MPI_INT, MPI_INT};               \
+  int          blocklengths[5] = {1,1,1,1,1};                                  \
+  MPI_Datatype types[5] = {MPI_INT,MPI_INT,MPI_INT, MPI_INT, MPI_INT};               \
   MPI_Datatype mpi_idea_type;                                                \
-  MPI_Aint     offsets[4];                                                   \
+  MPI_Aint     offsets[5];                                                   \
   offsets[0] = offsetof(Idea, a);                                            \
   offsets[1] = offsetof(Idea, b);                                            \
   offsets[2] = offsetof(Idea, c);                                            \
-  offsets[3] = offsetof(Idea, empty);                                        \
+  offsets[3] = offsetof(Idea, hs);                                            \
+  offsets[4] = offsetof(Idea, empty);                                        \
     MPI_Type_create_struct(4, blocklengths, offsets, types, &mpi_idea_type); \
     MPI_Type_commit(&mpi_idea_type);                                         \
 
