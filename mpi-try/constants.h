@@ -1,6 +1,6 @@
-// size of the field x/y
-#define X_SIZE 600
-#define Y_SIZE 240
+// size of the field x/y. 144 mio cells:
+#define X_SIZE 60000
+#define Y_SIZE 2400
 
 // it's not deterministic that there are actually 12 ideas, because they can be 
 // placed over one another in the creation phase
@@ -8,3 +8,7 @@
 
 // the maximum value for an idea's attributes
 #define IDEA_MAX 10
+
+// simulation rounds
+#define ROUNDS 3
+

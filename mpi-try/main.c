@@ -72,7 +72,6 @@ void mpi() {
   FILE *fp;
 
 
-#define ROUNDS 3
   for_every(i, ROUNDS, {
   tic();
   // movement ------------------------------------------------------------------
