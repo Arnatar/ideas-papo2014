@@ -2,8 +2,8 @@
 run() {
   sbatch -N $1 -n $2 --output=slurm-out/$1-$2 mpi.slurm
 }
-cd mpi-try
-rm -r slurm-out/*
+# cd mpi-try
+# rm -r slurm-out/*
 
 for N in {1..4}; do 
   for n in $(seq 2 2 12); do 
