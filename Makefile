@@ -14,7 +14,7 @@ num_threads=4
 mpirun:
 	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(num_threads) ./a.out $(args)
 
-manual:
-	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
+slurm:
+	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && sbatch mpi.slurm
 
 
