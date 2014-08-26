@@ -21,82 +21,99 @@ void mpi() {
   }
 
   // initializations -----------------------------------------------------------
+
   mpi_define_idea_type();
+
+  srand(time(NULL)+rank);
 
   init_time_measurement_variables();
 
+  char* _x = getenv("x");
+  char* _y = getenv("y");
+  int global_num_rows= _y ? atoi(_y) : 20000;
+  // it segfaults for big col values
+  int global_num_cols= _x ? atoi(_x) : 2000;
+  int global_num_ideas=global_num_cols*global_num_rows/3;
 
   int row_amount_distribution[num_ranks];
-  get_distribution(row_amount_distribution, num_ranks, Y_SIZE);
+  get_distribution(row_amount_distribution, num_ranks, global_num_rows);
 
   int ideas_amount_distribution[num_ranks];
-  get_distribution(ideas_amount_distribution, num_ranks, NUM_IDEAS);
+  get_distribution(ideas_amount_distribution, num_ranks, global_num_ideas);
 
   // add space for ghost rows on top and bottom
   int num_rows = row_amount_distribution[rank] + 2;
   int num_ideas = ideas_amount_distribution[rank];
+  int num_cols = global_num_cols;
 
-  // rank wraparound
+  // init fields ---------------------------------------------------------------
+  Idea **field = (Idea **)malloc(num_rows * sizeof(Idea *));
+  for (int i = 0; i < num_rows; ++i)
+      field[i] = (Idea *)malloc(num_cols * sizeof(Idea)); // for_every(i, nrows, {
+
+  Idea **field_new = (Idea **)malloc(num_rows * sizeof(Idea *));
+  for (int i = 0; i < num_rows; ++i)
+      field_new[i] = (Idea *)malloc(num_cols * sizeof(Idea)); // for_every(i, nrows, {
+
+  fill_matrix_with(field, num_rows, num_cols, idea_empty());
+
+  // spawn ideas (the random y-value for field excludes the ghost rows
+  for_every(i, num_ideas, 
+      field[rand_int(num_rows-2,1)][rand_int(num_cols,0)] = idea_new());
+
+
+  // rank wraparound -----------------------------------------------------------
 	const int next_rank = rank == num_ranks - 1 ? 0 : rank + 1;
 	const int prev_rank = rank == 0 ? num_ranks -1 : rank - 1;
 
-  srand(time(NULL)+rank);
 
-  tic();
-
-  Idea field[num_rows][X_SIZE];
-  fill_matrix_with(field, num_rows, idea_empty());
-
-  toc("fill field with zero ideas");
-
-
-  tic();
-  // spawn ideas (the random y-value for field excludes the ghost rows
-  for_every(i, num_ideas, 
-      field[rand_int(num_rows-2,1)][rand_int(X_SIZE,0)] = idea_new());
-
-  toc("fill with random ideas");
-
-  // fill all ghost rows
+  // // fill all ghost rows
   MPI_Request req, req2, req3, req4;
-  tic();
   send_real_rows_to_ghost_rows();
   receive_real_rows_into_ghost_rows();
-  toc("sending to ghost rows");
+  // // toc("sending to ghost rows");
+
 
   barrier();
+
+  copy_field_into_field_new();
 
   // get filename for rank ("out/$rank")
   char fname[100];
   get_fname(fname, rank);
   FILE *fp;
 
-
-  for_every(i, ROUNDS, {
   tic();
-  // movement ------------------------------------------------------------------
-  // serial: move all ideas which do not depend on other ranks. 
-  // then: 1) move all outer ideas from even ranks. 
-  //       1b) communicate to uneven ranks.
-  //       2) move all outer ideas from uneven ranks
-  //       2b) communicate to even ranks.
-  // send ideas ----------------------------------------------------------------
+  // for_every(i, ROUNDS, {
+  // // movement ------------------------------------------------------------------
+  // // serial: move all ideas which do not depend on other ranks. 
+  // // then: 1) move all outer ideas from even ranks. 
+  // //       1b) communicate to uneven ranks.
+  // //       2) move all outer ideas from uneven ranks
+  // //       2b) communicate to even ranks.
+  // // send ideas ----------------------------------------------------------------
 
 
-  // INDEPENDENT MOVEMENT
-  // reason for 7: 1 row in center, can move up or down without touching a dependent
-  // row. from the outer sides: 1 ghost row, 2 dependent rows each = 3*2. the next
-  // row above 6 is the first independent row. 
-  // [2]: give the independent movement procedure all rows starting from the 
-  //      third, until the third last. if num_rows = 8, num_rows-4 = 4. that means:
-  // take 3 rows from the array (the for loop is not inclusive).
-  // so for a matrix with 8 rows we take (0-based) rows 2,3,4,5. 0+1 and 6+7 are 
-  // left out.
-  if (num_rows >= 7) {
-    move_ideas(field[2], num_rows - 4, rank);
-  }
+  // // INDEPENDENT MOVEMENT
+  // // reason for 7: 1 row in center, can move up or down without touching a dependent
+  // // row. from the outer sides: 1 ghost row, 2 dependent rows each = 3*2. the next
+  // // row above 6 is the first independent row. 
+  // // [2]: give the independent movement procedure all rows starting from the 
+  // //      third, until the third last. if num_rows = 8, num_rows-4 = 4. that means:
+  // // take 3 rows from the array (the for loop is not inclusive).
+  // // so for a matrix with 8 rows we take (0-based) rows 2,3,4,5. 0+1 and 6+7 are 
+  // // left out.
+
+
 
   pr_field();
+
+  if (num_rows >= 7) {
+    move_ideas(2, num_rows-3);
+  }
+
+  // pr_logs();
+  // pr_field();
 
 
   // DEPENDENT MOVEMENT: first move+send from even ranks, then from uneven ranks
@@ -115,15 +132,37 @@ void mpi() {
     pr_field();
   }
 
-  toc("moving + communicating");
+  // });
+  toc();
+
+  // });
+  for_every(i, num_rows, {
+      free(field[i]);
   });
+  free(field);
+  for_every(i, num_rows, {
+      free(field_new[i]);
+  });
+  free(field_new);
 
   MPI_Type_free(&mpi_idea_type);
   MPI_Finalize();
 }
 
+typedef struct {
+    int i;
+} test;
+
 int main() {
-  pre(); mpi(); pre();
+  mpi();
+
+
+
+
+
+  pre();
+
+
 
 
 
