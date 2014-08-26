@@ -11,7 +11,10 @@ num_threads=4
 # julian:
 	# cd $(folder) && mpicc -std=c99 $(f) && mpirun -np $(num_threads) ./a.out | sort -n
 
-all:
+mpirun:
 	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(num_threads) ./a.out $(args)
+
+manual:
+	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
 
 
