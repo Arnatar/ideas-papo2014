@@ -5,7 +5,7 @@ run() {
 cd mpi-try
 rm -r slurm-out/*
 
-for N in {1.4}; do 
+for N in {1..4}; do 
   for n in $(seq 2 2 12); do 
     run $N $n
   done 
