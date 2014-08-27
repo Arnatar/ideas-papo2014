@@ -13,9 +13,13 @@ int wins_over(Idea i1, Idea i2) {
 // b idea complex
 // c idea worldview
 // h human worldview
-// TODO: implement
 int can_convince(Idea i1, Idea i2) {
-  int convinceable = 0;
+  int convinceable = 1;
+  if(abs((i1.c - i2.h)) > 4 || abs((i2.c - i1.h)) > 4) {
+    convinceable = 0;
+  } else if(abs(i1.b - i2.b) > 5) {
+    convinceable = 0;
+  }
   return convinceable;
 } 
 
@@ -55,20 +59,24 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
             field_new[new_y][new_x] = idea;
             field_new[y][x] = idea_empty();
           } else {
-            write("neighbor not empty, communicate with "); write_idea(neighbor_idea);
+            write("neighbor not empty, communicate with "); 
+            write_idea(neighbor_idea);
             write("... -> ");
             
-            // TODO: insert competition constraint test & winner-copying
-            if (wins_over(neighbor_idea, idea)) {
-              write_idea(neighbor_idea); write("wins.\n");
-              field[y][x] = neighbor_idea;
-              field_new[y][x] = neighbor_idea;
+            // TODO: correct winner-copying (4th var)
+            if(can_convince(idea, neighbor_idea)) { 
+              if (wins_over(neighbor_idea, idea)) {
+                write_idea(neighbor_idea); write("wins.\n");
+                field[y][x] = neighbor_idea;
+                field_new[y][x] = neighbor_idea;
 
-            } else if (wins_over(idea, neighbor_idea)) {
-              write_idea(idea); write("wins.\n");
-              field_new[new_y][new_x] = idea;
-              field[new_y][new_x] = idea;
+              } else if (wins_over(idea, neighbor_idea)) {
+                write_idea(idea); write("wins.\n");
+                field_new[new_y][new_x] = idea;
+                field[new_y][new_x] = idea;
+              }
             }
+            else write("can't compete.\n");
           }
           write("\n");
 
