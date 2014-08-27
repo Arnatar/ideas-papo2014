@@ -26,20 +26,21 @@ measurements_file=measurements/measurements.csv
 
 # run config -------------------------------------------------------------------
 # max is 120. starts with 2 ranks, increments by 2 until $max_ranks
-max_ranks=30
+min_rank=2
+max_ranks=24
 
 # global field size
 x=2000
-y=60000
+y=600
 
 #-------------------------------------------------------------------------------
 # sync the project folder to the cluster
-rsync -a --delete --exclude presentation --exclude src --exclude '.git' ../* cluster:/home/$cluster_username/ideas/
+rsync -a --delete --exclude presentation --exclude src --exclude '.git' ../* cluster:/home/$cluster_username/ideas/ 2>/dev/null
 
 cells=$(pprint $((x*y)))
 echo -e "\n Running with $cells cells.\n"
 
-ssh cluster x=$x y=$y max_ranks=$max_ranks measurements_file=$measurements_file "bash -s" << 'ENDSSH'
+ssh cluster x=$x y=$y min_rank=$min_rank max_ranks=$max_ranks measurements_file=$measurements_file "bash -s" << 'ENDSSH'
 cd ideas
 make slurm > /dev/null
 cd mpi-try
@@ -48,7 +49,7 @@ echo ""
 rm -f $measurements_file
 salloc -n $max_ranks
 
-for n in $(seq 2 2 $max_ranks); do 
+for n in $(seq $min_rank 2 $max_ranks); do 
   echo -ne "$n: " | tee -a $measurements_file
   x=$x y=$y mpiexec -n $n ./a.out | tee -a $measurements_file
 done 
