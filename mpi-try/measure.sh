@@ -1,5 +1,5 @@
 source ./scripts/helpers.sh
-
+[[ $@ ]] || { echo "usage: measure.sh [name-of-measurement]"; exit 1; }
 # how to run this --------------------------------------------------------------
 # 1. add the following to ~/.ssh/config :
 # Host cluster
@@ -13,17 +13,6 @@ source ./scripts/helpers.sh
 # customize the following script options -----------------------------------------
 cluster_username=werner
 
-# the python environment should have pygal installed
-# recommended setup procedure:
-#   - in mpi-try-folder: virtualenv .virtualenv
-#   - in .bashrc: PATH=.virtualenv/bin:$PATH
-#   - open new terminal
-#   - in mpi-try-folder: pip install -r requirements.txt
-python=./.virtualenv/bin/python
-svg_viewer=google-chrome-stable
-
-measurements_file=measurements/measurements.csv
-
 # run config -------------------------------------------------------------------
 # max is 120. starts with 2 ranks, increments by 2 until $max_ranks
 min_rank=2
@@ -31,16 +20,22 @@ max_ranks=24
 
 # global field size
 x=2000
-y=600
-
+y=120000
+rounds=1
+num_attributes=4
+int_size=4
+size_bytes=$((x*y*int_size*num_attributes))
+size_gb=$(bc <<< "scale=2; $size_bytes/1024^3")
 #-------------------------------------------------------------------------------
 # sync the project folder to the cluster
 rsync -a --delete --exclude presentation --exclude src --exclude '.git' ../* cluster:/home/$cluster_username/ideas/ 2>/dev/null
 
 cells=$(pprint $((x*y)))
-echo -e "\n Running with $cells cells.\n"
+echo -e "\n Running with $cells cells ($size_gb GB)"
 
-ssh cluster x=$x y=$y min_rank=$min_rank max_ranks=$max_ranks measurements_file=$measurements_file "bash -s" << 'ENDSSH'
+measurements_file=measurements/$1.csv
+
+ssh cluster rounds=$rounds x=$x y=$y min_rank=$min_rank max_ranks=$max_ranks measurements_file=$measurements_file "bash -s" << 'ENDSSH'
 cd ideas
 make slurm > /dev/null
 cd mpi-try
@@ -51,7 +46,7 @@ salloc -n $max_ranks
 
 for n in $(seq $min_rank 2 $max_ranks); do 
   echo -ne "$n: " | tee -a $measurements_file
-  x=$x y=$y mpiexec -n $n ./a.out | tee -a $measurements_file
+  rounds=$rounds x=$x y=$y mpiexec -n $n ./a.out | tee -a $measurements_file
 done 
 
 exit
@@ -60,6 +55,4 @@ ENDSSH
 rsync -a cluster:/home/$cluster_username/ideas/mpi-try/$measurements_file $measurements_file
 
 # graph output -----------------------------------------------------------------
-$python ./measurements/graph.py $cells
-$svg_viewer measurements/chart.svg
-
+./draw.sh

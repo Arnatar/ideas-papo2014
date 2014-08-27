@@ -38,10 +38,21 @@
   }                                 \
 
 #define fill_array_with(arr, size, fill) \
-for(int x=0; x<size; x++) {            \
-    arr[x] = fill;                     \
-  }                                    \
+for(int x=0; x<size; x++) {              \
+    arr[x] = fill;                       \
+  }                                      \
 
+
+#define malloc_idea_matrix(name)                            \
+  Idea **name = (Idea **)malloc(num_rows * sizeof(Idea *)); \
+  for (int i = 0; i < num_rows; ++i)                        \
+      name[i] = (Idea *)malloc(num_cols * sizeof(Idea));    \
+
+#define free_idea_matrix(name) \
+  for_every(i, num_rows, {     \
+    free(name[i]);             \
+  });                          \
+  free(name);
 
 // MPI -------------------------------------------------------------------------
 
