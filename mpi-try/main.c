@@ -30,7 +30,11 @@ void mpi() {
 
   char* _x = getenv("x");
   char* _y = getenv("y");
-  int global_num_rows= _y ? atoi(_y) : 20000;
+  if (!_y) {
+    master(fputs("No environment variables for field size found.\n\n", stderr));
+    exit(-1);
+  }
+  int global_num_rows= _y ? atoi(_y) : 200;
   // it segfaults for big col values
   int global_num_cols= _x ? atoi(_x) : 2000;
   int global_num_ideas=global_num_cols*global_num_rows/3;
