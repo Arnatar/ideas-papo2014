@@ -1,4 +1,4 @@
-// #define DEBUG
+#define DEBUG
 #include <stdlib.h>
 #include <stdio.h>
 #define COLOR    "\x1b[32m"

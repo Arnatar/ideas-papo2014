@@ -31,11 +31,11 @@ Idea idea_new()
   int temph = i.c + rand_int(4, -2);
   if (0 <= temph) {
     if (temph < IDEA_MAX) {
-      i.b = temph;
+      i.h = temph;
     } 
-    else i.b = IDEA_MAX - 1;
+    else i.h = IDEA_MAX - 1;
   } 
-  else i.b = 0;
+  else i.h = 0;
 
   i.empty = 0;
   return i;
