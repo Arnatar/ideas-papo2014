@@ -10,5 +10,5 @@
 #define IDEA_MAX 10
 
 // simulation rounds
-#define ROUNDS 3
+#define ROUNDS 1
 

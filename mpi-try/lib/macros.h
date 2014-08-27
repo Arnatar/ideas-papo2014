@@ -223,6 +223,7 @@ for(int x=0; x<size; x++) {            \
 
 // num_rows is not inclusive. e.g.: 0,3 would iterate over 1 and 2 in move_ideas,
 // because the for loop starts with start_row+1 and the stop condition is '< num_rows'
+// TODO: optimize: not the whole field has to be copied (?)
 #define move_ideas(start_row, num_rows) \
   _move_ideas(field, field_new, start_row, num_rows, num_cols, rank); \
   copy_field_new_into_field();

@@ -115,11 +115,11 @@ void mpi() {
   pr_field();
 
   if (num_rows >= 7) {
-    move_ideas(2, num_rows-3);
+    move_ideas(2, num_rows-5);
   }
 
-  // pr_logs();
-  // pr_field();
+  pr_logs();
+  pr_field();
 
 
   // DEPENDENT MOVEMENT: first move+send from even ranks, then from uneven ranks

@@ -6,7 +6,7 @@ include_paths=-Ilib/ -Iheaders/lib/ -Iheaders/ -I.
 library_paths=-lrt -Llib
 args=
 folder=mpi-try
-procs=4
+procs=2
 
 # julian:
 	# cd $(folder) && mpicc -std=c99 $(f) && mpirun -np $(num_threads) ./a.out | sort -n
