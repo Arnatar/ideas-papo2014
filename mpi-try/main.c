@@ -49,7 +49,7 @@ void mpi() {
   int num_ideas = ideas_amount_distribution[rank];
   int num_cols = global_num_cols;
 
-  if (num_rows = 3) {
+  if (num_rows == 3) {
     master(fputs("num_rows=3 for a rank is not supported in the current implementation\n\n", stderr));
     exit(-1);
   }
