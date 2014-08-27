@@ -55,8 +55,6 @@
 *.x86_64
 *.hex
 
-out/
-log/
-measurements/*.csv
-measurements/*.svg
+*.csv
+*.svg
 .virtualenv

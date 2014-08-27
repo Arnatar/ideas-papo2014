@@ -32,6 +32,7 @@ max_ranks=24
 # global field size
 x=2000
 y=600
+rounds=1
 
 #-------------------------------------------------------------------------------
 # sync the project folder to the cluster
@@ -40,7 +41,7 @@ rsync -a --delete --exclude presentation --exclude src --exclude '.git' ../* clu
 cells=$(pprint $((x*y)))
 echo -e "\n Running with $cells cells.\n"
 
-ssh cluster x=$x y=$y min_rank=$min_rank max_ranks=$max_ranks measurements_file=$measurements_file "bash -s" << 'ENDSSH'
+ssh cluster rounds=$rounds x=$x y=$y min_rank=$min_rank max_ranks=$max_ranks measurements_file=$measurements_file "bash -s" << 'ENDSSH'
 cd ideas
 make slurm > /dev/null
 cd mpi-try
@@ -51,7 +52,7 @@ salloc -n $max_ranks
 
 for n in $(seq $min_rank 2 $max_ranks); do 
   echo -ne "$n: " | tee -a $measurements_file
-  x=$x y=$y mpiexec -n $n ./a.out | tee -a $measurements_file
+  rounds=$rounds x=$x y=$y mpiexec -n $n ./a.out | tee -a $measurements_file
 done 
 
 exit

@@ -30,6 +30,7 @@ void mpi() {
 
   char* _x = getenv("x");
   char* _y = getenv("y");
+  char* _rounds = getenv("rounds");
 
   // if (!_y) {
   //   master(fputs("No environment variables for field size found.\n\n", stderr));
@@ -39,6 +40,7 @@ void mpi() {
   int global_num_rows= _y ? atoi(_y) : 12;
   // it segfaults for big col values
   int global_num_cols= _x ? atoi(_x) : 4;
+  int rounds= _rounds ? atoi(_rounds) : 1;
   int global_num_ideas=global_num_cols*global_num_rows/3;
 
   int row_amount_distribution[num_ranks];
@@ -90,7 +92,7 @@ void mpi() {
   FILE *fp;
 
   tic();
-  for_every(i, ROUNDS, {
+  for_every(i, rounds, {
   // // movement ------------------------------------------------------------------
   // // serial: move all ideas which do not depend on other ranks. 
   // // then: 1) move all outer ideas from even ranks. 
