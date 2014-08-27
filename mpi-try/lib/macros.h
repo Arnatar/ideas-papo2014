@@ -94,9 +94,8 @@ for(int x=0; x<size; x++) {            \
 
 
 // OUTPUT
-
-// #define pr_idea(idea)                             \
-//   printf("(%d,%d,%d) ",idea.a, idea.b, idea.c) \
+#define pr_idea(idea)                             \
+   printf("(Qual: %d, Complx: %d, IWV: %d, HWV: %d) ",idea.a, idea.b, idea.c, idea.h) \
 
 
 #ifdef DEBUG
@@ -104,7 +103,7 @@ for(int x=0; x<size; x++) {            \
 #define write(...) fprintf(fp, __VA_ARGS__)
 
 #define write_idea(idea)                             \
-  write("(%d,%d,%d) ",idea.a, idea.b, idea.c) \
+  write("(%d,%d,%d,%d) ",idea.a, idea.b, idea.c, idea.h) \
 
 // print array of ideas
 #define write_field()                                   \

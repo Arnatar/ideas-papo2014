@@ -18,10 +18,10 @@ Idea idea_new()
   // complex should depend on qual
   int tempb = i.a + rand_int(3, -1);
   if (0 <= tempb) {
-    if (tempb <= IDEA_MAX) {
+    if (tempb < IDEA_MAX) {
       i.b = tempb;
     } 
-    else i.b = IDEA_MAX;
+    else i.b = IDEA_MAX - 1;
   } 
   else i.b = 0;
 
@@ -30,10 +30,10 @@ Idea idea_new()
   // first human worldview based on its init idea worldview
   int temph = i.c + rand_int(4, -2);
   if (0 <= temph) {
-    if (temph <= IDEA_MAX) {
+    if (temph < IDEA_MAX) {
       i.b = temph;
     } 
-    else i.b = IDEA_MAX;
+    else i.b = IDEA_MAX - 1;
   } 
   else i.b = 0;
 
