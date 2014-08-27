@@ -12,9 +12,7 @@ procs=4
 	# cd $(folder) && mpicc -std=c99 $(f) && mpirun -np $(num_threads) ./a.out | sort -n
 
 all:
-	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(procs) ./a.out $(args)
+	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(procs) ./a.out $(args)
 
 slurm:
-	cd $(folder) && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
-
-
+	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
