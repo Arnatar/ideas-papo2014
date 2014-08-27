@@ -30,15 +30,12 @@ void mpi() {
 
   char* _x = getenv("x");
   char* _y = getenv("y");
-
-  // if (!_y) {
-  //   master(fputs("No environment variables for field size found.\n\n", stderr));
-  //   exit(-1);
-  // }
+  char* _rounds = getenv("rounds");
 
   int global_num_rows= _y ? atoi(_y) : 12;
   // it segfaults for big col values
   int global_num_cols= _x ? atoi(_x) : 4;
+  int rounds= _rounds ? atoi(_rounds) : 1;
   int global_num_ideas=global_num_cols*global_num_rows/3;
 
   int row_amount_distribution[num_ranks];
@@ -52,21 +49,20 @@ void mpi() {
   int num_ideas = ideas_amount_distribution[rank];
   int num_cols = global_num_cols;
 
-  // init fields ---------------------------------------------------------------
-  Idea **field = (Idea **)malloc(num_rows * sizeof(Idea *));
-  for (int i = 0; i < num_rows; ++i)
-      field[i] = (Idea *)malloc(num_cols * sizeof(Idea)); // for_every(i, nrows, {
+  if (num_rows == 3) {
+    master(fputs("num_rows=3 for a rank is not supported in the current implementation\n\n", stderr));
+    exit(-1);
+  }
 
-  Idea **field_new = (Idea **)malloc(num_rows * sizeof(Idea *));
-  for (int i = 0; i < num_rows; ++i)
-      field_new[i] = (Idea *)malloc(num_cols * sizeof(Idea)); // for_every(i, nrows, {
+  // init fields ---------------------------------------------------------------
+  malloc_idea_matrix(field)
+  malloc_idea_matrix(field_new)
 
   fill_matrix_with(field, num_rows, num_cols, idea_empty());
 
   // spawn ideas (the random y-value for field excludes the ghost rows
   for_every(i, num_ideas, 
       field[rand_int(num_rows-2,1)][rand_int(num_cols,0)] = idea_new());
-
 
   // rank wraparound -----------------------------------------------------------
 	const int next_rank = rank == num_ranks - 1 ? 0 : rank + 1;
@@ -77,8 +73,6 @@ void mpi() {
   MPI_Request req, req2, req3, req4;
   send_real_rows_to_ghost_rows();
   receive_real_rows_into_ghost_rows();
-  // // toc("sending to ghost rows");
-
 
   barrier();
 
@@ -90,7 +84,8 @@ void mpi() {
   FILE *fp;
 
   tic();
-  for_every(i, ROUNDS, {
+
+  for_every(i, rounds, {
   // // movement ------------------------------------------------------------------
   // // serial: move all ideas which do not depend on other ranks. 
   // // then: 1) move all outer ideas from even ranks. 
@@ -110,17 +105,11 @@ void mpi() {
   // // so for a matrix with 8 rows we take (0-based) rows 2,3,4,5. 0+1 and 6+7 are 
   // // left out.
 
-
-
   pr_field();
 
   if (num_rows >= 7) {
     move_ideas(2, num_rows-5);
   }
-
-  pr_logs();
-  pr_field();
-
 
   // DEPENDENT MOVEMENT: first move+send from even ranks, then from uneven ranks
   for(int l=0; l<2; l++) {
@@ -138,20 +127,13 @@ void mpi() {
     pr_field();
   }
 
-  // });
 
-  });
+  }); // end loop
+
   toc();
 
-  for_every(i, num_rows, {
-      free(field[i]);
-  });
-  free(field);
-  for_every(i, num_rows, {
-      free(field_new[i]);
-  });
-  free(field_new);
-
+  free_idea_matrix(field);
+  free_idea_matrix(field_new);
   MPI_Type_free(&mpi_idea_type);
   MPI_Finalize();
 }
