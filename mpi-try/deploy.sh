@@ -26,7 +26,7 @@ measurements_file=measurements/measurements.csv
 
 # run config -------------------------------------------------------------------
 # max is 120. starts with 2 ranks, increments by 2 until $max_ranks
-max_ranks=12
+max_ranks=30
 
 # global field size
 x=2000
