@@ -30,9 +30,9 @@
 #define pr(...) printf(__VA_ARGS__); printf("\n")
 
 
-#define fill_matrix_with(arr, rows, fill) \
+#define fill_matrix_with(arr, rows, cols, fill) \
   for(int y=0; y<rows; y++) {       \
-    for(int x=0; x<X_SIZE; x++) {     \
+    for(int x=0; x<cols; x++) {     \
       arr[y][x] = fill;             \
     }                               \
   }                                 \
@@ -62,10 +62,10 @@ for(int x=0; x<size; x++) {            \
   MPI_Isend(&idea, 1, mpi_idea_type, to, to, MPI_COMM_WORLD, &req) 
 
 #define send_ideas(ideas_arr, to, tag, req) \
-  MPI_Isend(ideas_arr, X_SIZE, mpi_idea_type, to, tag, MPI_COMM_WORLD, &req) 
+  MPI_Isend(ideas_arr, num_cols, mpi_idea_type, to, tag, MPI_COMM_WORLD, &req) 
 
 #define receive_ideas_into(ideas_arr, from, tag, req) \
-  MPI_Irecv(ideas_arr, X_SIZE, mpi_idea_type, from, tag, MPI_COMM_WORLD, &req) 
+  MPI_Irecv(ideas_arr, num_cols, mpi_idea_type, from, tag, MPI_COMM_WORLD, &req) 
 
 #define receive_into(buf, from, req) \
   MPI_Irecv(&buf, 1, mpi_idea_type, from, rank, MPI_COMM_WORLD, &req) 
@@ -108,7 +108,7 @@ for(int x=0; x<size; x++) {            \
 // print array of ideas
 #define write_field()                                   \
     for(int i=0; i<num_rows; i++) {                     \
-      for(int j=0; j<X_SIZE; j++) {                     \
+      for(int j=0; j<num_cols; j++) {                     \
         Idea idea = field[i][j];                        \
         if (!idea.empty) {                              \
           write(COLOR); write_idea(idea); write(RESET); \
@@ -143,6 +143,7 @@ for(int x=0; x<size; x++) {            \
       prfile(fname);          \
       pre();                  \
     });                       \
+      prs("result:\n");\
   );                          
 
 #define pr_specific_logs(j)                  \
@@ -159,6 +160,7 @@ for(int x=0; x<size; x++) {            \
             pre();                             \
           }                                    \
       });                                      \
+      prs("result:\n");\
   );                          
 
 
@@ -215,9 +217,20 @@ for(int x=0; x<size; x++) {            \
   receive_ideas_into(field[1], prev_rank, GHOST, req4);                 \
 
 
+
+// void _move_ideas(Idea** field, Idea** field_new, int start_row, 
+//                 int num_rows, int num_cols, int rank) {
+
+// num_rows is not inclusive. e.g.: 0,3 would iterate over 1 and 2 in move_ideas,
+// because the for loop starts with start_row+1 and the stop condition is '< num_rows'
+#define move_ideas(start_row, num_rows) \
+  _move_ideas(field, field_new, start_row, num_rows, num_cols, rank); \
+  copy_field_new_into_field();
+
+
 #define move_dependent_rows()    \
-  move_ideas(field[0], 3, rank); \
-  move_ideas(field[num_rows-3], 3, rank); 
+  move_ideas(0, 3); \
+  move_ideas(num_rows - 4, 3); 
 
 #define send_rows()               \
   send_real_rows_to_ghost_rows(); \
@@ -241,11 +254,39 @@ for(int x=0; x<size; x++) {            \
 
 
 
-#define toc(description)                                                           \
+#define tocs(description)                                                           \
   gettimeofday(&end_time,NULL);                                         \
   end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
   diff=end_dtime-start_dtime;                                           \
-  master(pr("%s: %f seconds.", description, diff));
+  master(pr("%s: %f", description, diff));
 
 
+#define toc()                                                           \
+  gettimeofday(&end_time,NULL);                                         \
+  end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
+  diff=end_dtime-start_dtime;                                           \
+  master(pr("%f", diff));
+// temp
+#define prf(field) \
+  for_every(i, num_rows, { \
+      for_every(j, num_cols, { \
+          pr_idea(field[i][j]); \
+      }); \
+      pre(); \
+  }); \
+      pre(); \
 
+
+#define copy_field_into_field_new()    \
+  for_every(i, num_rows, {             \
+    for_every(j, num_cols, {           \
+        field_new[i][j] = field[i][j]; \
+      });                              \
+  }); 
+
+#define copy_field_new_into_field()    \
+  for_every(i, num_rows, {             \
+    for_every(j, num_cols, {           \
+        field[i][j] = field_new[i][j]; \
+      });                              \
+  }); 

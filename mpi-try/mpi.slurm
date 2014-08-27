@@ -8,5 +8,4 @@
 # Output goes to job.out, error messages to job.err.
 #SBATCH --error=job.err --output=job.out
 	
-srun hostname
 mpiexec ./a.out

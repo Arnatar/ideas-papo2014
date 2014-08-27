@@ -57,3 +57,6 @@
 
 out/
 log/
+measurements/*.csv
+measurements/*.svg
+.virtualenv
