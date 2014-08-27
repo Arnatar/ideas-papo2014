@@ -90,7 +90,7 @@ void mpi() {
   FILE *fp;
 
   tic();
-  // for_every(i, ROUNDS, {
+  for_every(i, ROUNDS, {
   // // movement ------------------------------------------------------------------
   // // serial: move all ideas which do not depend on other ranks. 
   // // then: 1) move all outer ideas from even ranks. 
@@ -139,9 +139,10 @@ void mpi() {
   }
 
   // });
+
+  });
   toc();
 
-  // });
   for_every(i, num_rows, {
       free(field[i]);
   });

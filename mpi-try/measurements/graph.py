@@ -14,7 +14,7 @@ x_labels = [col[0] for col in f]
 y_values = [float(col[1]) for col in f]
 # print(y_values);
 
-chart = pygal.Bar()
+chart = pygal.Line()
 chart.title = 'Performance (in seconds)'
 
 chart.x_labels = x_labels
