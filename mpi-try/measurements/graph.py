@@ -1,22 +1,29 @@
-import pygal                                                       # First import pygal
+import pygal
 import csv
 import sys
-
-cells = sys.argv[1]
+import os
+# cells = sys.argv[1]
 
 def read_file(path):
     with open(path) as f:
         return list(csv.reader(f, delimiter=':'))
 
-f = read_file("measurements/measurements.csv")
+csvs = {}
+for f in os.listdir("measurements"):
+    if f.endswith(".csv"):
+        csvs[f.split(".")[0]] = read_file("measurements/" + f)
 
-x_labels = [col[0] for col in f]
-y_values = [float(col[1]) for col in f]
-# print(y_values);
 
 chart = pygal.Line()
-chart.title = 'Performance (in seconds)'
+chart.title = 'Performance'
 
-chart.x_labels = x_labels
-chart.add(cells + " cells", y_values)
+for label, values in csvs.items():
+    x_labels = [col[0] for col in values]
+    chart.x_labels = x_labels
+
+    y_values = [float(col[1]) for col in values]
+    # chart.add(label + " absolute" , y_values)
+    y_values = [(float(values[0][1])*int(values[0][0]))/(float(col[1])*int(col[0]))for col in values]
+    chart.add(label + " relative" , y_values)
+
 chart.render_to_file('measurements/chart.svg')
