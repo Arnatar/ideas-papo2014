@@ -19,3 +19,6 @@ local_perf:
 
 slurm:
 	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
+
+draw:
+	cd $(folder) && mkdir -p draw && mkdir -p out && mkdir -p log && rm -rf draw/* && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -DDRAW -include allheads.h && rounds=5 x=4 y=8 mpirun -np 4 ./a.out $(args)
