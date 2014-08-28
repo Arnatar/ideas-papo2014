@@ -203,30 +203,42 @@ for(int x=0; x<size; x++) {              \
 #define GHOST 7777
 #define REAL 6666
 
+
 #define send_real_rows_to_ghost_rows() \
   /* send our last real row into top ghost row of the next rank */             \
   send_ideas(field[num_rows-2], next_rank, REAL, req);                         \
   /* send our first real row into the bottom ghost row of the previous rank */ \
   send_ideas(field[1], prev_rank, REAL, req2);                                 \
-
-#define send_ghost_rows_to_real_rows()                                         \
-  /* send our first ghost row into the bottom real row of the previous rank */ \
-  send_ideas(field[0], prev_rank, GHOST, req3);                                \
-  /* send our last ghost row into the top real row of the next rank */         \
-  send_ideas(field[num_rows-1], next_rank, GHOST, req4);                       \
-
+  
 #define receive_real_rows_into_ghost_rows()                             \
   /* receive last real row from previous rank into our top ghost row */ \
   receive_ideas_into(field[0], prev_rank, REAL, req);                   \
   /* receive first real row from next rank into our bottom ghost row */ \
   receive_ideas_into(field[num_rows-1], next_rank, REAL, req2);         \
 
-#define receive_ghost_rows_into_real_rows()                             \
+#define send_top_rows() \
+  /* send our first ghost row into the bottom real row of the previous rank */ \
+  send_ideas(field[0], prev_rank, GHOST, req);                                \
+  /* send our first real row into the bottom ghost row of the previous rank */ \
+  send_ideas(field[1], prev_rank, REAL, req2);                                 \
+
+#define receive_into_bottom_rows() \
   /* receive first ghost row from next rank into our bottom real row */ \
-  receive_ideas_into(field[num_rows-2], next_rank, GHOST, req3);        \
+  receive_ideas_into(field[num_rows-2], next_rank, GHOST, req);        \
+  /* receive first real row from next rank into our bottom ghost row */ \
+  receive_ideas_into(field[num_rows-1], next_rank, REAL, req2);         \
+
+#define send_bottom_rows() \
+  /* send our last real row into top ghost row of the next rank */             \
+  send_ideas(field[num_rows-2], next_rank, REAL, req3);                         \
+  /* send our last ghost row into the top real row of the next rank */         \
+  send_ideas(field[num_rows-1], next_rank, GHOST, req4);                       \
+
+#define receive_into_top_rows() \
+  /* receive last real row from previous rank into our top ghost row */ \
+  receive_ideas_into(field[0], prev_rank, REAL, req3);                   \
   /* receive last ghost row from prev rank into our top real row */     \
   receive_ideas_into(field[1], prev_rank, GHOST, req4);                 \
-
 
 
 // void _move_ideas(Idea** field, Idea** field_new, int start_row, 
@@ -240,8 +252,14 @@ for(int x=0; x<size; x++) {              \
   copy_field_new_into_field();
 
 
-#define move_dependent_rows()    \
-  move_ideas(0, 3); \
+// #define move_dependent_rows()    \
+//   move_ideas(0, 3); \
+//   move_ideas(num_rows - 4, 3); 
+
+#define move_top_rows() \
+  move_ideas(0, 3);
+
+#define move_bottom_rows() \
   move_ideas(num_rows - 4, 3); 
 
 #define send_rows()               \
