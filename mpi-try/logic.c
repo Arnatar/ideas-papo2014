@@ -4,8 +4,8 @@
 
 // a idea quali
 int wins_over(Idea i1, Idea i2) {
-  int i1quali = i1.a + rand_int(4, -2);
-  int i2quali = i2.a + rand_int(4, -2);
+  int i1quali = i1.a + rand_int(5, -2);
+  int i2quali = i2.a + rand_int(5, -2);
   int first_wins = i1quali >= i2quali;
   return first_wins;
 }
@@ -22,6 +22,25 @@ int can_convince(Idea i1, Idea i2) {
   }
   return convinceable;
 } 
+
+Idea build_winner(Idea winner, Idea loser) {
+  Idea tempIdea = loser;
+  tempIdea.a = winner.a;
+  tempIdea.b = winner.b;
+  tempIdea.c = winner.c;
+  int temph = tempIdea.c - loser.h;
+  if (temph > 0) {
+    temph = loser.h + temph / 2 + 1 + rand_int(3, -1);
+  } else {
+    temph = loser.h + temph / 2 - 1 + rand_int(3, -1);
+  }
+  if (temph >= 0) {
+    if (temph < IDEA_MAX) {
+      tempIdea.h = temph;
+    } else tempIdea.h = IDEA_MAX - 1;
+  } else tempIdea.h = 0;
+  return tempIdea;
+}
 
 void _move_ideas(Idea** field, Idea** field_new, int start_row, 
                 int num_rows, int num_cols, int rank) {
@@ -67,13 +86,15 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
             if(can_convince(idea, neighbor_idea)) { 
               if (wins_over(neighbor_idea, idea)) {
                 write_idea(neighbor_idea); write("wins.\n");
-                field[y][x] = neighbor_idea;
-                field_new[y][x] = neighbor_idea;
+                Idea tempIdea = build_winner(neighbor_idea, idea);
+                field[y][x] = tempIdea;
+                field_new[y][x] = tempIdea;
 
               } else if (wins_over(idea, neighbor_idea)) {
                 write_idea(idea); write("wins.\n");
-                field_new[new_y][new_x] = idea;
-                field[new_y][new_x] = idea;
+                Idea tempIdea = build_winner(idea, neighbor_idea);
+                field_new[new_y][new_x] = tempIdea;
+                field[new_y][new_x] = tempIdea;
               }
             }
             else write("can't compete.\n");

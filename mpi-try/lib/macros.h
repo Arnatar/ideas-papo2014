@@ -209,7 +209,7 @@ for(int x=0; x<size; x++) {              \
   send_ideas(field[num_rows-2], next_rank, REAL, req);                         \
   /* send our first real row into the bottom ghost row of the previous rank */ \
   send_ideas(field[1], prev_rank, REAL, req2);                                 \
-  
+
 #define receive_real_rows_into_ghost_rows()                             \
   /* receive last real row from previous rank into our top ghost row */ \
   receive_ideas_into(field[0], prev_rank, REAL, req);                   \

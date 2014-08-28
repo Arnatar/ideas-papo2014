@@ -25,10 +25,19 @@ Idea idea_new()
   } 
   else i.b = 0;
 
-  i.c = rand_int(IDEA_MAX, 0);
-
+  /*
+  int test = rand_int(2, 0);
+  if (test == 1) {
+    i.c = 6;
+    i.h = 3;
+  } else {
+    i.c = 3;
+    i.h = 6;
+  }*/
   // first human worldview based on its init idea worldview
-  int temph = i.c + rand_int(4, -2);
+  
+  i.c = rand_int(IDEA_MAX, 0);  
+  int temph = i.c + rand_int(5, -2);
   if (0 <= temph) {
     if (temph < IDEA_MAX) {
       i.h = temph;
@@ -38,6 +47,7 @@ Idea idea_new()
   else i.h = 0;
 
   i.empty = 0;
+  
   return i;
 }
 

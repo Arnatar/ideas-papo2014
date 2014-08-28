@@ -29,8 +29,8 @@ void mpi() {
 
   int global_num_rows= _y ? atoi(_y) : 8;
   // it segfaults for big col values
-  int global_num_cols= _x ? atoi(_x) : 4;
-  int rounds= _rounds ? atoi(_rounds) : 4;
+  int global_num_cols= _x ? atoi(_x) : 2;
+  int rounds= _rounds ? atoi(_rounds) : 8;
   int global_num_ideas=global_num_cols*global_num_rows/3;
 
   int row_amount_distribution[num_ranks];
@@ -102,6 +102,7 @@ void mpi() {
 
   pr_field();
 
+
   if (num_rows >= 7) {
     move_ideas(2, num_rows-5);
   }
@@ -133,12 +134,11 @@ void mpi() {
   free_idea_matrix(field_new);
   MPI_Type_free(&mpi_idea_type);
   MPI_Finalize();
-}
+ }
 
 
 int main() {
   mpi();
-
 }
 
 
