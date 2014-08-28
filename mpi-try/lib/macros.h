@@ -218,7 +218,7 @@ for(int x=0; x<size; x++) {              \
 
 #define send_top_rows() \
   /* send our first ghost row into the bottom real row of the previous rank */ \
-  send_ideas(field[0], next_rank, GHOST, req);                                \
+  send_ideas(field[0], prev_rank, GHOST, req);                                \
   /* send our first real row into the bottom ghost row of the previous rank */ \
   send_ideas(field[1], prev_rank, REAL, req2);                                 \
 

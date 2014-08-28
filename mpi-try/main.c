@@ -15,11 +15,6 @@ void get_distribution(int distribution[], int nranks, int global_amount) {
 void mpi() {
   mpi_init(); // rank, num_ranks
 
-  // if (num_ranks =) {
-  //   master(fputs("Use an even amount of processes for now.\n\n", stderr));
-  //   exit(-1);
-  // }
-
   // initializations -----------------------------------------------------------
 
   mpi_define_idea_type();
