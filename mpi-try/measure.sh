@@ -16,11 +16,11 @@ cluster_username=werner
 # run config -------------------------------------------------------------------
 # max is 120. starts with 2 ranks, increments by 2 until $max_ranks
 min_rank=2
-max_ranks=24
+max_ranks=12
 
 # global field size
 x=2000
-y=120000
+y=60000
 rounds=1
 num_attributes=4
 int_size=4
