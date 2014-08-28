@@ -15,10 +15,10 @@ void get_distribution(int distribution[], int nranks, int global_amount) {
 void mpi() {
   mpi_init(); // rank, num_ranks
 
-  if (num_ranks % 2 != 0) {
-    master(fputs("Use an even amount of processes for now.\n\n", stderr));
-    exit(-1);
-  }
+  // if (num_ranks =) {
+  //   master(fputs("Use an even amount of processes for now.\n\n", stderr));
+  //   exit(-1);
+  // }
 
   // initializations -----------------------------------------------------------
 
@@ -32,7 +32,7 @@ void mpi() {
   char* _y = getenv("y");
   char* _rounds = getenv("rounds");
 
-  int global_num_rows= _y ? atoi(_y) : 12;
+  int global_num_rows= _y ? atoi(_y) : 18;
   // it segfaults for big col values
   int global_num_cols= _x ? atoi(_x) : 4;
   int rounds= _rounds ? atoi(_rounds) : 1;
@@ -114,22 +114,21 @@ void mpi() {
   pr_logs();
   pr_field();
 
+  move_top_rows();
+  send_top_rows();
+  receive_into_bottom_rows();
+  barrier();
 
-  // DEPENDENT MOVEMENT: first move+send from even ranks, then from uneven ranks
-  for(int l=0; l<2; l++) {
-    if (rank % 2 == l) {
-        move_dependent_rows();
-        send_rows();
-    } else {
-        receive_rows();
-    }
-    barrier();
+  pr_logs();
+  pr_field();
 
-    // master(pre();pre(););
-    // this displays the bottom dependent row movements only for now!
-    pr_specific_logs(l);
-    pr_field();
-  }
+  move_bottom_rows();
+  send_bottom_rows();
+  receive_into_top_rows();
+  barrier();
+
+  pr_logs();
+  pr_field();
 
 
   }); // end loop
