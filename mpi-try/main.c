@@ -105,7 +105,8 @@ void mpi() {
 
   if (num_rows >= 7) {
     move_ideas(2, num_rows-5);
-    copy_partial_field_into_field_new(3, num_rows-5);
+    // copy_partial_field_into_field_new(3, num_rows-5);
+    copy_field_new_into_field();
   }
 
   pr_logs();

@@ -253,11 +253,13 @@ for(int x=0; x<size; x++) {              \
 
 #define move_top_rows() \
   move_ideas(0, 3); \
-  copy_partial_field_into_field_new(0, 4);
+  copy_field_new_into_field();
+  // copy_partial_field_into_field_new(0, 4);
 
 #define move_bottom_rows() \
   move_ideas(num_rows - 4, 3);  \
-  copy_partial_field_into_field_new(num_rows-4, 4);
+  copy_field_new_into_field();
+  // copy_partial_field_into_field_new(num_rows-4, 4);
 
 #define send_rows()               \
   send_real_rows_to_ghost_rows(); \
