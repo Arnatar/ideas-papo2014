@@ -21,4 +21,4 @@ slurm:
 	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
 
 draw:
-	cd $(folder) && mkdir -p draw && mkdir -p out && mkdir -p log && rm -rf draw/* && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -DDRAW -include allheads.h && rounds=5 x=4 y=8 mpirun -np 4 ./a.out $(args)
+	cd $(folder) && mkdir -p draw/data && mkdir -p out && mkdir -p log && rm -rf draw/data/* && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -DDRAW -DDEBUG -include allheads.h && rounds=1 x=4 y=14 mpirun -np 2 ./a.out $(args)

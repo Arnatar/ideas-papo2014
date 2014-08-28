@@ -52,7 +52,7 @@ void get_log_fname(char* fname, int rank) {
 }
 
 void get_draw_fname(char* fname, int iteration) {
-  sprintf(fname, "draw/%d", iteration);
+  sprintf(fname, "draw/data/%d", iteration);
 }
 
 void get_fname(char* fname, int rank) {

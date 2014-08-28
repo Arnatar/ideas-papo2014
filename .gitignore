@@ -57,8 +57,9 @@
 
 log/
 out/
-draw/
+draw/data/
 *.csv
 *.svg
 .virtualenv
 run
+*.pyc

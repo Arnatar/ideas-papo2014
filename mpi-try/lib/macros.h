@@ -319,7 +319,7 @@ for(int x=0; x<size; x++) {              \
 #define write_draw(...) fprintf(fp, __VA_ARGS__)
 
 #define write_idea_draw(idea)                             \
-  write_draw("(%d,%d,%d,%d) ",idea.a, idea.b, idea.c, idea.h) \
+  write_draw("%d %d %d %d, ",idea.a, idea.b, idea.c, idea.h) \
 
 // print array of ideas
 #define save_local_field_for_drawing() \
@@ -349,7 +349,7 @@ for(int x=0; x<size; x++) {              \
   );                                             \
 
 #else
-#define write_idea()
+#define write_idea_draw()
 #define save_local_field_for_drawing()
 #define generate_draw_files()
 #endif
