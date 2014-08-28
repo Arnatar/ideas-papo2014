@@ -27,7 +27,7 @@ void mpi() {
   char* _y = getenv("y");
   char* _rounds = getenv("rounds");
 
-  int global_num_rows= _y ? atoi(_y) : 18;
+  int global_num_rows= _y ? atoi(_y) : 12;
   // it segfaults for big col values
   int global_num_cols= _x ? atoi(_x) : 4;
   int rounds= _rounds ? atoi(_rounds) : 1;
@@ -104,6 +104,7 @@ void mpi() {
 
   if (num_rows >= 7) {
     move_ideas(2, num_rows-5);
+    copy_partial_field_new_into_field(3, num_rows-5);
   }
 
   pr_logs();
