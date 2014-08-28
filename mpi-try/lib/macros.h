@@ -250,17 +250,14 @@ for(int x=0; x<size; x++) {              \
   _move_ideas(field, field_new, start_row, num_rows, num_cols, rank); \
 
 
-// #define move_dependent_rows()    \
-//   move_ideas(0, 3); \
-//   move_ideas(num_rows - 4, 3); 
 
 #define move_top_rows() \
   move_ideas(0, 3); \
-  copy_partial_field_new_into_field(0,4);
+  copy_partial_field_into_field_new(0, 4);
 
 #define move_bottom_rows() \
   move_ideas(num_rows - 4, 3);  \
-  copy_partial_field_new_into_field(num_rows-4, 4);
+  copy_partial_field_into_field_new(num_rows-4, 4);
 
 #define send_rows()               \
   send_real_rows_to_ghost_rows(); \
@@ -321,9 +318,9 @@ for(int x=0; x<size; x++) {              \
       });                              \
   }); 
 
-#define copy_partial_field_new_into_field(start_row, num_rows)    \
+#define copy_partial_field_into_field_new(start_row, num_rows)    \
   for(int i=start_row; i<start_row+num_rows; i++) { \
     for(int j=0; j<num_cols; j++) { \
-        field[i][j] = field_new[i][j]; \
+        field_new[i][j] = field[i][j]; \
       }                              \
   } 
