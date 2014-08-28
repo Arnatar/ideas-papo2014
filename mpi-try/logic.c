@@ -24,19 +24,19 @@ int can_convince(Idea i1, Idea i2) {
 } 
 
 Idea build_winner(Idea winner, Idea loser) {
-  Idea tempIdea = loser;
+  Idea tempIdea;
   tempIdea.a = winner.a;
   tempIdea.b = winner.b;
   tempIdea.c = winner.c;
-  int temph = tempIdea.c - loser.h;
-  if (temph > 0) {
-    temph = loser.h + temph / 2 + 1 + rand_int(3, -1);
-  } else {
-    temph = loser.h + temph / 2 - 1 + rand_int(3, -1);
-  }
-  if (temph >= 0) {
-    if (temph < IDEA_MAX) {
-      tempIdea.h = temph;
+  int adjust = tempIdea.c - loser.h;
+  if (adjust > 0) {
+    adjust = loser.h + adjust / 2 + 1 + rand_int(3, -1);
+  } else if (adjust < 0) {
+    adjust = loser.h + adjust / 2 - 1 + rand_int(3, -1);
+  } else adjust = rand_int(3, -1);
+  if (adjust >= 0) {
+    if (adjust < IDEA_MAX) {
+      tempIdea.h = adjust;
     } else tempIdea.h = IDEA_MAX - 1;
   } else tempIdea.h = 0;
   return tempIdea;

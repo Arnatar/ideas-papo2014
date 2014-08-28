@@ -27,10 +27,10 @@ void mpi() {
   char* _y = getenv("y");
   char* _rounds = getenv("rounds");
 
-  int global_num_rows= _y ? atoi(_y) : 12;
+  int global_num_rows= _y ? atoi(_y) : 8;
   // it segfaults for big col values
-  int global_num_cols= _x ? atoi(_x) : 4;
-  int rounds= _rounds ? atoi(_rounds) : 10;
+  int global_num_cols= _x ? atoi(_x) : 2;
+  int rounds= _rounds ? atoi(_rounds) : 4;
   int global_num_ideas=global_num_cols*global_num_rows/3;
 
   int row_amount_distribution[num_ranks];
@@ -109,7 +109,7 @@ void mpi() {
   }
 
   pr_logs();
-  pr_field();
+  //pr_field();
 
   move_top_rows();
   send_top_rows();
@@ -117,7 +117,7 @@ void mpi() {
   barrier();
 
   pr_logs();
-  pr_field();
+  //pr_field();
 
   move_bottom_rows();
   send_bottom_rows();
