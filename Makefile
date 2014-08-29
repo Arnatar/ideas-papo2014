@@ -6,7 +6,7 @@ include_paths=-Ilib/ -Iheaders/lib/ -Iheaders/ -I.
 library_paths=-lrt -Llib
 args=
 folder=mpi-try
-procs=2
+procs=4
 
 # julian:
 	# cd $(folder) && mpicc -std=c99 $(f) && mpirun -np $(num_threads) ./a.out | sort -n
@@ -21,4 +21,10 @@ slurm:
 	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
 
 draw:
-	cd $(folder) && mkdir -p draw/data && mkdir -p out && mkdir -p log && rm -rf draw/data/* && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -DDRAW -DDEBUG -include allheads.h && rounds=1 x=4 y=14 mpirun -np 2 ./a.out $(args)
+	cd $(folder) && mkdir -p draw/data && mkdir -p out && mkdir -p log && rm -rf draw/data/* && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np 4 ./a.out $(args)
+
+# draw:
+# 	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np 4 ./a.out $(args)
+
+draw2:
+	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(procs) ./a.out $(args)

@@ -17,7 +17,7 @@ for f in files:
                     for nums in line.split(",")[:-1]])
     step.append(step_data)
 
-
-for i, s in enumerate(step):
-    if i>0:
-        print(step[i]==step[i-1])
+Draw(step)
+# for i, s in enumerate(step):
+#     if i>0:
+#         print(step[i]==step[i-1])

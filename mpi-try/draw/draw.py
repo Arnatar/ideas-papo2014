@@ -77,7 +77,7 @@ class Draw():
             # self.draw_point(10+x,10)
 
             pygame.display.flip()
-            self.clock.tick(10)
+            self.clock.tick(2)
 
             step+=1
             if step > len(self.data)-2: done = True
