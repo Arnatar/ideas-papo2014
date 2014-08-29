@@ -1,6 +1,7 @@
 #include "constants.h"
 #include "idea.h"
 #include "helpers.h"
+#define FAIRCHECKING
 
 // a idea quali
 int wins_over(Idea i1, Idea i2) {
@@ -62,8 +63,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
 
         //check for neighbors
 
-        //unfair checking
-        /*
+        #ifndef FAIRCHECKING
         //int count = 0;
         //write("idea:"); write_idea(idea); write("\n");
         for (move_x; move_x < 2; move_x++) {
@@ -83,10 +83,11 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
             }
           }
         }
-        //write("Runcount: %d\n",count); */
-        
-        //fair checking
+        //write("Runcount: %d\n",count);
+        #endif
 
+        //fair checking
+        #ifdef FAIRCHECKING
         Idea neighborset[8];
         int neighbor_count = 0;
         for (move_x; move_x < 2; move_x++) {
@@ -109,14 +110,18 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
         for (int i = 0; i < neighbor_count; i++) {
           write_idea(idea); write("\'s neighborset: ");write_idea(neighborset[i]);write("neighbor_count: %d \n", neighbor_count);
         }*/
+        #endif 
 
         // if cell has neighbor(s) 
         if (having_neighbors) {          
           // new_y = new_y == X_SIZE ? 0 : new_y == -1 ? X_SIZE-1 : new_y;
-          //Idea neighbor_idea = field_new[new_y][new_x];
-          
+          #ifndef FAIRCHECKING
+          Idea neighbor_idea = field_new[new_y][new_x];
+          #else
           Idea neighbor_idea = neighborset[rand_int(neighbor_count,0)];
-          write_idea(idea); write("at %dx, %dy");
+          #endif
+
+          write_idea(idea); write("at %dx, %dy", x, y);
           write(" has neighbors \n communicates with ");
           write_idea(neighbor_idea); write(" -> ");
           
@@ -137,9 +142,12 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
             else write("can't compete.\n");
         }
         write("\n");
-        int try_movement = 0;
+
+        // movement
+        int try_movement = 1;
         int movement_count = 0;
-        while (!try_movement && movement_count < 8) {
+        // find an empty field and move there
+        while (try_movement && movement_count < 8) {
           movement_count++;
           move_x = rand_int(3, -1);
           move_y = rand_int(3, -1);
@@ -147,11 +155,18 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           new_y = y + move_y;
           new_x = new_x == num_cols ? 0 : new_x == -1 ? num_cols-1 : new_x;
           if ((move_x || move_y) && field_new[new_y][new_x].empty) {
+            //field[new_y][new_x] = idea;
+            //field[y][x] = idea_empty();
             field_new[new_y][new_x] = idea;
             field_new[y][x] = idea_empty();
-            try_movement++;
-            write("moved to %dx, %dy", new_x, new_y);
-          } else write("did not move");
+            try_movement = 0;
+            write_idea(idea);
+            write("moved to %dx, %dy", new_x + 1, new_y + 1);
+          }
+        }
+        if (try_movement) {
+          write_idea(idea);
+          write("did not move");
         }
       }
     }
