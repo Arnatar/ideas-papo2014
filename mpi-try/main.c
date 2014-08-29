@@ -29,9 +29,9 @@ void mpi() {
 
   int global_num_rows= _y ? atoi(_y) : 8;
   // it segfaults for big col values
-  int global_num_cols= _x ? atoi(_x) : 2;
-  int rounds= _rounds ? atoi(_rounds) : 4;
-  int global_num_ideas=global_num_cols*global_num_rows/3;
+  int global_num_cols= _x ? atoi(_x) : 4;
+  int rounds= _rounds ? atoi(_rounds) : 5;
+  int global_num_ideas = 1 ;// global_num_cols*global_num_rows/3;
 
   int row_amount_distribution[num_ranks];
   get_distribution(row_amount_distribution, num_ranks, global_num_rows);
@@ -100,7 +100,7 @@ void mpi() {
   // // so for a matrix with 8 rows we take (0-based) rows 2,3,4,5. 0+1 and 6+7 are 
   // // left out.
 
-  pr_field();
+  //pr_field();
 
 
   if (num_rows >= 7) {

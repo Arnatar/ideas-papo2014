@@ -48,59 +48,110 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
   open_logfile_for_writing();
 
   for(int y=start_row+1; y<start_row+num_rows; y++) {
-      // printf("rank %d, y=%d\n", rank, y);
     for(int x=0; x<num_cols; x++) {
 
       Idea idea = field[y][x]; 
 
-      // if cell is inhabited, possibly move
+      // if cell is inhabited, first neighbor & competion, then moving
       if (!idea.empty) {
-        int move_x = rand_int(3,-1);
-        int move_y = rand_int(3,-1);
+        int move_x = -1; 
+        int move_y = -1;
+        int having_neighbors = 0;
+        int new_x = 0; 
+        int new_y = 0; 
 
-        // if cell actually moves 
-        if (move_x || move_y) {
+        //check for neighbors
 
-          int new_x = x+move_x;
-          int new_y = y+move_y;
+        //unfair checking
+        /*
+        //int count = 0;
+        //write("idea:"); write_idea(idea); write("\n");
+        for (move_x; move_x < 2; move_x++) {
+          if (having_neighbors) break;
+          new_x = x + move_x;
           new_x = new_x == num_cols ? 0 : new_x == -1 ? num_cols-1 : new_x;
+          move_y = -1;
+          for (move_y; move_y < 2; move_y++) {
+        //    count++;
+        //    write("move_x: %d, move_y: %d \n", move_x, move_y);
+            if (! (move_x || move_y)) break;
+            new_y = y + move_y;
+            if (!(field_new[new_y][new_x].empty)) {
+              having_neighbors = 1;
+        //      write("neighbor spotted\n");
+              break;
+            }
+          }
+        }
+        //write("Runcount: %d\n",count); */
+        
+        //fair checking
+
+        Idea neighborset[8];
+        int neighbor_count = 0;
+        for (move_x; move_x < 2; move_x++) {
+          new_x = x + move_x;
+          new_x = new_x == num_cols ? 0 : new_x == -1 ? num_cols-1 : new_x;
+          move_y = -1;
+          for (move_y; move_y < 2; move_y++) {
+        //    write("move_x: %d, move_y: %d \n", move_x, move_y);
+            if (! (move_x || move_y)) break;
+            new_y = y + move_y;
+            if (!(field_new[new_y][new_x].empty)) {
+              having_neighbors = 1;
+              neighborset[neighbor_count] = field_new[new_y][new_x]; 
+              neighbor_count++;
+              break;
+            }
+          }
+        }
+        /*
+        for (int i = 0; i < neighbor_count; i++) {
+          write_idea(idea); write("\'s neighborset: ");write_idea(neighborset[i]);write("neighbor_count: %d \n", neighbor_count);
+        }*/
+
+        // if cell has neighbor(s) 
+        if (having_neighbors) {          
           // new_y = new_y == X_SIZE ? 0 : new_y == -1 ? X_SIZE-1 : new_y;
-          Idea neighbor_idea = field_new[new_y][new_x];
+          //Idea neighbor_idea = field_new[new_y][new_x];
+          
+          Idea neighbor_idea = neighborset[rand_int(neighbor_count,0)];
+          write_idea(idea); write("at %dx, %dy");
+          write(" has neighbors \n communicates with ");
+          write_idea(neighbor_idea); write(" -> ");
+          
+          if(can_convince(idea, neighbor_idea)) { 
+            if (wins_over(neighbor_idea, idea)) {
+              write_idea(neighbor_idea); write("wins.\n");
+              Idea tempIdea = build_winner(neighbor_idea, idea);
+              field[y][x] = tempIdea;
+              field_new[y][x] = tempIdea;
 
-          write_idea(idea); write(": row %d, col %d -> ",  y+1,x+1);
-          write(move_x == 1? "right" : move_x == -1? " left" : "");
-          write(move_y == 1? " down" : move_y == -1? " up" : "");
-          write(" (%d, %d)\n", new_y+1, new_x+1);
-
-          // if neighbor-cell is empty, move there. if not test competition constraints & compete
-          if (neighbor_idea.empty) {
-            write("neighbor empty\n");
+            } else if (wins_over(idea, neighbor_idea)) {
+              write_idea(idea); write("wins.\n");
+              Idea tempIdea = build_winner(idea, neighbor_idea);
+              field_new[new_y][new_x] = tempIdea;
+              field[new_y][new_x] = tempIdea;
+            }
+          }
+            else write("can't compete.\n");
+        }
+        write("\n");
+        int try_movement = 0;
+        int movement_count = 0;
+        while (!try_movement && movement_count < 8) {
+          movement_count++;
+          move_x = rand_int(3, -1);
+          move_y = rand_int(3, -1);
+          new_x = x + move_x;
+          new_y = y + move_y;
+          new_x = new_x == num_cols ? 0 : new_x == -1 ? num_cols-1 : new_x;
+          if ((move_x || move_y) && field_new[new_y][new_x].empty) {
             field_new[new_y][new_x] = idea;
             field_new[y][x] = idea_empty();
-          } else {
-            write("neighbor not empty, communicate with "); 
-            write_idea(neighbor_idea);
-            write("... -> ");
-            
-            // TODO: correct winner-copying (4th var)
-            if(can_convince(idea, neighbor_idea)) { 
-              if (wins_over(neighbor_idea, idea)) {
-                write_idea(neighbor_idea); write("wins.\n");
-                Idea tempIdea = build_winner(neighbor_idea, idea);
-                field[y][x] = tempIdea;
-                field_new[y][x] = tempIdea;
-
-              } else if (wins_over(idea, neighbor_idea)) {
-                write_idea(idea); write("wins.\n");
-                Idea tempIdea = build_winner(idea, neighbor_idea);
-                field_new[new_y][new_x] = tempIdea;
-                field[new_y][new_x] = tempIdea;
-              }
-            }
-            else write("can't compete.\n");
-          }
-          write("\n");
-
+            try_movement++;
+            write("moved to %dx, %dy", new_x, new_y);
+          } else write("did not move");
         }
       }
     }
