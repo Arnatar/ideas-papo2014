@@ -21,10 +21,4 @@ slurm:
 	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h
 
 draw:
-	cd $(folder) && mkdir -p draw/data && mkdir -p out && mkdir -p log && rm -rf draw/data/* && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np 4 ./a.out $(args)
-
-# draw:
-# 	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np 4 ./a.out $(args)
-
-draw2:
-	cd $(folder) && mkdir -p out && mkdir -p log && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -include allheads.h && mpirun -np $(procs) ./a.out $(args)
+	cd $(folder) && mkdir -p draw/data && mkdir -p out && mkdir -p log && rm -rf draw/data/* && rm -rf log/* && rm -rf out/* && mpicc -pg -std=c99 $(f) $(library_paths) $(include_paths) -DDRAW -include allheads.h && x=50 y=50 rounds=100 mpirun -np 4 ./a.out $(args)
