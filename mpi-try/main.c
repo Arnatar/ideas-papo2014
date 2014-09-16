@@ -83,7 +83,7 @@ void mpi() {
   FILE *fp_draw;
 
   tic();
-
+  //pr_field();
   for_every(i, rounds, {
     master(pr("ROUND %d =================================", i));
     generate_draw_files();
@@ -123,6 +123,7 @@ void mpi() {
   // move_ideas_down(0, 3); 
   move_ideas(0, 3); 
   barrier();
+
 
   send_top_rows(field_new);
   receive_into_bottom_rows(field_new);

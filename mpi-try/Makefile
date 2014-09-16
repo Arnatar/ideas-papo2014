@@ -12,15 +12,19 @@ CFLAGS=-std=c99
 all: debug
 
 debug: CFLAGS += -DDEBUG -g
+debug: CFLAGS += -DFAIRMOVEMENT
+debug: CFLAGS += -DFAIRCHECKING
 debug: build_executable
 debug: procs=2
 debug: x=4
-debug: y=24
-debug: rounds=100
-debug: ideas=3
+debug: y=20
+debug: rounds=150
+debug: ideas=20
 debug: run
 
 pygame: CFLAGS += -DDRAW
+pygame: CFLAGS += -DFAIRMOVEMENT
+pygame: CFLAGS += -DFAIRCHECKING
 # pygame: CFLAGS += -DDRAW
 pygame: setup_draw_data_folder
 pygame: build_executable
@@ -28,7 +32,7 @@ pygame: procs=2
 pygame: x=50
 pygame: y=50
 pygame: rounds=1000
-pygame: ideas=30
+pygame: ideas=25
 pygame: run
 
 build_executable: setup_folders

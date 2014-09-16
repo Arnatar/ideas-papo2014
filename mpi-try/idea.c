@@ -66,4 +66,16 @@ Idea idea_empty() {
   return i;
 }
 
+Idea idea_dupl(Idea i2) {
+  Idea i;
+  i.a = i2.a;
+  i.b = i2.b;
+  i.c = i2.c;
+  i.h = i2.h;
+  i.empty = i2.empty;
+
+  return i;
+}
+
+
 #endif

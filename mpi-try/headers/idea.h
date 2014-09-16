@@ -6,3 +6,4 @@ typedef struct {
 
 Idea idea_new(void);
 Idea idea_empty(void);
+Idea idea_dupl(Idea);
