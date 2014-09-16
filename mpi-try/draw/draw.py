@@ -9,7 +9,9 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
+# size of one piece
 SIZE=10
+# amount of pieces x/y
 AMOUNT=50
 class Draw():
     def __init__(self, data):
@@ -21,6 +23,7 @@ class Draw():
 
 
         self.init_pygame()
+        self.doubles = {}
         self.run()
 
         # pygame.display.update()
@@ -32,17 +35,26 @@ class Draw():
         self.screen = pygame.display.set_mode((AMOUNT*SIZE,AMOUNT*SIZE), 0, 32)
         self.clock = pygame.time.Clock()
 
-    def draw_point(self,x,y):
-        draw.rect(self.screen, BLACK, [x, y, SIZE, SIZE])
+    def draw_point(self,x,y, qual):
+        color=25*qual
+        draw.rect(self.screen, (color,color,color), [x, y, SIZE, SIZE])
 
     def print_step(self, nr):
         step = self.data[nr]
-        print step
-        print(self.data[nr] == self.data[nr-1])
+        # pprint(step)
+        # print(self.data[nr] == self.data[nr-1])
         for y, row in enumerate(step):
             for x, col in enumerate(row):
                 if not col == [0,0,0,0]:
-                    self.draw_point(SIZE*x,SIZE*y)
+                    if nr>0 and self.data[nr-1][y][x] == col:
+                        if (y,x,tuple(col)) in self.doubles:
+                            self.doubles[(y,x,tuple(col))] += 1
+
+                        else:
+                            self.doubles[(y,x,tuple(col))] = 0
+
+                    # print(y,x)
+                    self.draw_point(SIZE*x,SIZE*y, col[0])
 
 
     def run(self):
@@ -54,7 +66,7 @@ class Draw():
                 if event.type == QUIT:
                     done = True
 
-            self.screen.fill(WHITE)
+            self.screen.fill(BLACK)
 
             # pygame.display.flip()
             # self.clock.tick(1)
@@ -77,11 +89,13 @@ class Draw():
             # self.draw_point(10+x,10)
 
             pygame.display.flip()
-            self.clock.tick(2)
+            self.clock.tick(30)
 
             step+=1
             if step > len(self.data)-2: done = True
 
+
+        pprint([(k,v) for k,v in self.doubles.items() if v>5])
         pygame.quit()
 
 

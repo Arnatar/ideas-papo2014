@@ -116,22 +116,26 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
             if(can_convince(idea, neighbor_idea)) { 
               if (wins_over(neighbor_idea, idea)) {
                 write_idea(neighbor_idea); write("wins.\n");
-                Idea tempIdea = build_winner(neighbor_idea, idea);
-                field[y][x] = tempIdea;
-                field_new[y][x] = idea_dupl(tempIdea);
+                // Idea tempIdea = build_winner(neighbor_idea, idea);
+                // field[y][x] = tempIdea;
+                // field_new[y][x] = idea_dupl(tempIdea);
+                field[y][x] = idea_dupl(neighbor_idea);
+                field_new[y][x] = idea_dupl(neighbor_idea);
 
               } else if (wins_over(idea, neighbor_idea)) {
                 write_idea(idea); write("wins.\n");
-                Idea tempIdea = build_winner(idea, neighbor_idea);
-                field_new[new_y][new_x] = tempIdea;
-                field[new_y][new_x] = idea_dupl(tempIdea);
+                // Idea tempIdea = build_winner(idea, neighbor_idea);
+                // field_new[new_y][new_x] = tempIdea;
+                // field[new_y][new_x] = idea_dupl(tempIdea);
+                field_new[new_y][new_x] = idea_dupl(idea);
+                field[new_y][new_x] = idea_dupl(idea);
               }
             }
             else write("can't compete.\n");
           }
           write("\n");
 
-        }
+        } 
       }
     }
   }

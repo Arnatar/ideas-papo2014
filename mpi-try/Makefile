@@ -20,9 +20,24 @@ debug: rounds=100
 debug: ideas=3
 debug: run
 
+pygame: CFLAGS += -DDRAW
+# pygame: CFLAGS += -DDRAW
+pygame: setup_draw_data_folder
+pygame: build_executable
+pygame: procs=2
+pygame: x=50
+pygame: y=50
+pygame: rounds=1000
+pygame: ideas=30
+pygame: run
 
 build_executable: setup_folders
 	mpicc $(CFLAGS) $(f) $(library_paths) $(include_paths) -include allheads.h 
+
+
+setup_draw_data_folder:
+	mkdir -p draw/data
+	rm -rf draw/data/*
 
 setup_folders:
 	mkdir -p out 

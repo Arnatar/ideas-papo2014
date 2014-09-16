@@ -26,7 +26,6 @@
 #define length(array) (sizeof(array)/sizeof(*(array)))
 #define copy(a,b) memcpy(b,a,sizeof(b))
 
-#define pr(...) printf(__VA_ARGS__); printf("\n")
 
 
 #define fill_matrix_with(arr, rows, cols, fill) \
@@ -103,14 +102,17 @@ for(int x=0; x<size; x++) {              \
 #define uneven_ranks(f) if (rank % 2 != 0) { f; }
 
 
-// OUTPUT
-#define pr_idea(idea)                             \
-   printf("(Qual: %d, Complx: %d, IWV: %d, HWV: %d) ",idea.a, idea.b, idea.c, idea.h) \
+// // OUTPUT
+// #define pr_idea(idea)                             \
+//    printf("(Qual: %d, Complx: %d, IWV: %d, HWV: %d) ",idea.a, idea.b, idea.c, idea.h) \
 
+#define pr_idea(idea)                             \
+   printf("(%d %d %d %d)\n ",idea.a, idea.b, idea.c, idea.h) \
 
 #ifdef DEBUG
 
 #define write(...) fprintf(fp, __VA_ARGS__)
+#define write_doubles(...) fprintf(fp_doubles, __VA_ARGS__)
 
 #define write_idea(idea)                             \
   write("(%d,%d,%d,%d) ",idea.a, idea.b, idea.c, idea.h) \
@@ -157,6 +159,7 @@ for(int x=0; x<size; x++) {              \
   );                          
 
 
+
 #define open_logfile_for_writing() \
   char log_fname[100];             \
   get_log_fname(log_fname, rank);  \
@@ -167,6 +170,7 @@ for(int x=0; x<size; x++) {              \
   fclose(fp);
 
 #define prs(str) _prs(str)
+#define pr(...) printf(__VA_ARGS__); printf("\n")
 
 #else
 #define write(...)
@@ -176,6 +180,7 @@ for(int x=0; x<size; x++) {              \
 #define pr_logs()
 #define pr_specific_logs(...)
 #define prs(...)
+#define pr(...)
 
 #define open_logfile_for_writing()
 #define close_logfile();
@@ -326,9 +331,9 @@ for(int x=0; x<size; x++) {              \
 
 // print array of ideas
 #define save_local_field_for_drawing() \
-    for(int i=1; i<num_rows-1; i++) {  \
-      for(int j=0; j<num_cols; j++) {  \
-        Idea idea = field[i][j];       \
+    for(int j=1; j<num_rows-1;j++) {  \
+      for(int k=0; k<num_cols; k++) {  \
+        Idea idea = field[j][k];       \
         write_idea_draw(idea);         \
       }                                \
       write_newline();                 \

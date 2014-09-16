@@ -86,6 +86,7 @@ void mpi() {
 
   for_every(i, rounds, {
     master(pr("ROUND %d =================================", i));
+    generate_draw_files();
     pr_field(field_new);
   // // movement ------------------------------------------------------------------
   // // serial: move all ideas which do not depend on other ranks. 
@@ -115,9 +116,9 @@ void mpi() {
   barrier();
 
 
-  master(prs("INDEPENDENT ROWS"));
-  pr_logs();
-  pr_field(field_new);
+  // master(prs("INDEPENDENT ROWS"));
+  // pr_logs();
+  // pr_field(field_new);
 
   // move_ideas_down(0, 3); 
   move_ideas(0, 3); 
@@ -126,29 +127,33 @@ void mpi() {
   send_top_rows(field_new);
   receive_into_bottom_rows(field_new);
   barrier();
+  send_top_rows(field);
+  receive_into_bottom_rows(field);
+  barrier();
 
-  master(prs("DEPENDENT ROWS TOP"));
-  pr_logs();
-  pr_field(field_new);
+  // master(prs("DEPENDENT ROWS TOP"));
+  // pr_logs();
+  // pr_field(field_new);
 
   // move_ideas_down(num_rows - 4, 3);  
   move_ideas(num_rows - 4, 3);  
   barrier();
+
   send_bottom_rows(field_new);
   receive_into_top_rows(field_new);
   barrier();
 
-  master(prs("DEPENDENT ROWS BOTTOM"));
-  pr_logs();
-  pr_field(field_new);
+
+  // master(prs("DEPENDENT ROWS BOTTOM"));
+  // pr_logs();
+  // pr_field(field_new);
 
   copy_field_new_into_field();
   barrier();
 
-  master(prs("RESULT"));
-  pr_field(field);
+  // master(prs("RESULT"));
+  // pr_field(field);
 
-  generate_draw_files();
 
   }); //endloop
 

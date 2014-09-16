@@ -2,5 +2,5 @@ main:
   build: .
   command: bash
   volumes:
-    - .:/code
+    - mpi-try:/code
   working_dir: /code
