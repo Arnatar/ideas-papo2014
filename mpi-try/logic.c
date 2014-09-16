@@ -40,6 +40,7 @@ Idea build_winner(Idea winner, Idea loser) {
     } else tempIdea.h = IDEA_MAX - 1;
   } else tempIdea.h = 0;
   return tempIdea;
+}
 
 Idea idea_dupl(Idea i2) {
   Idea i;
@@ -63,15 +64,8 @@ void _move_ideas_down(Idea** field, Idea** field_new, int start_row,
         field_new[y+1][x] = idea_dupl(idea);
           write_idea(idea); write(": row %d, col %d -> ",  y+1,x+1);
           write(" (%d, %d)\n", y+2, x+1);
-      // pri(&field_new[y][x]);
-      // pri(&field_new[y+1][x]);
-      // pre();
         field_new[y][x] = idea_empty();
       }
-
-      // field_new[y][x] = idea_dupl();
-      // field_new[y][x] = idea_empty();
-      // field_new[y][x] = idea_empty();
     }
   }
   close_logfile();
@@ -111,7 +105,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           // if neighbor-cell is empty, move there. if not test competition constraints & compete
           if (neighbor_idea.empty) {
             write("neighbor empty\n");
-            field_new[new_y][new_x] = idea;
+            field_new[new_y][new_x] = idea_dupl(idea);
             field_new[y][x] = idea_empty();
           } else {
             write("neighbor not empty, communicate with "); 

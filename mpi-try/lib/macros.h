@@ -149,30 +149,11 @@ for(int x=0; x<size; x++) {              \
   barrier(); \
   master(                     \
     for_every(i, num_ranks, { \
-      pr("[%d] ================================\n", i); \
+      pr("[%d]..............\n", i); \
       get_log_fname(fname, i);    \
       prfile(fname);          \
       pre();                  \
     });                       \
-      prs("result:\n");\
-  );                          
-
-
-#define pr_specific_logs(j)                  \
-  barrier();                                 \
-  master(                                    \
-    printf(j % 2 == 0? "EVEN" : "UNEVEN");     \
-    prs(" ranks moving dependent rows now (just the bottom row's):"); \
-    prs("-----------------------------------------"); \
-    for_every(i, num_ranks, {                  \
-        if(i % 2 == j) {                       \
-          pr("[rank %d]", i); \
-          get_log_fname(fname, i);             \
-            prfile(fname);                     \
-            pre();                             \
-          }                                    \
-      });                                      \
-      prs("result:\n");\
   );                          
 
 

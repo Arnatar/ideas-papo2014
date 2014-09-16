@@ -12,6 +12,7 @@ void get_distribution(int distribution[], int nranks, int global_amount) {
   for_every(i, nranks, distribution[i] = base_amount + rests[i]);
 }
 
+
 void mpi() {
   mpi_init(); // rank, num_ranks
 
@@ -27,7 +28,7 @@ void mpi() {
   char* _y = getenv("y");
   char* _rounds = getenv("rounds");
 
-  int global_num_rows= _y ? atoi(_y) : 12;
+  int global_num_rows= _y ? atoi(_y) : 24;
   // it segfaults for big col values
   int global_num_cols= _x ? atoi(_x) : 4;
   int rounds= _rounds ? atoi(_rounds) : 4;
@@ -56,14 +57,8 @@ void mpi() {
   fill_matrix_with(field, num_rows, num_cols, idea_empty());
 
   // // spawn ideas (the random y-value for field excludes the ghost rows
-  // for_every(i, num_ideas, 
-  //     field[rand_int(num_rows-2,1)][rand_int(num_cols,0)] = idea_new());
-  master(field[3][0] = idea_new());
-  master(field[3][1] = idea_new());
-  master(field[3][2] = idea_new());
-  master(field[1][0] = idea_new());
-  master(field[1][1] = idea_new());
-  master(field[1][2] = idea_new());
+  for_every(i, num_ideas, 
+      field[rand_int(num_rows-2,1)][rand_int(num_cols,0)] = idea_new());
 
   // rank wraparound -----------------------------------------------------------
 	const int next_rank = rank == num_ranks - 1 ? 0 : rank + 1;
@@ -86,11 +81,9 @@ void mpi() {
 
   tic();
 
-  // pr_field();
-  // for_every(i, rounds, {
-  for (int i=0; i<rounds; i++) {
-    master(pr("ROUND %d", i));
-    pr_field(field);
+  for_every(i, rounds, {
+    master(pr("ROUND %d =================================", i));
+    pr_field(field_new);
   // // movement ------------------------------------------------------------------
   // // serial: move all ideas which do not depend on other ranks. 
   // // then: 1) move all outer ideas from even ranks. 
@@ -113,43 +106,47 @@ void mpi() {
 
 
   if (num_rows >= 7) {
-    move_ideas_down(2, num_rows-5);
-    // copy_field_new_into_field();
+    // move_ideas_down(2, num_rows-5);
+    move_ideas(2, num_rows-5);
   }
+  barrier();
 
 
-  // pr_logs();
-  // copy_field_into_field_new();
-  // pr_field(field_new);
-  // pr_field();
+  master(prs("INDEPENDENT ROWS"));
+  pr_logs();
+  pr_field(field_new);
 
-  move_ideas_down(0, 3); 
+  // move_ideas_down(0, 3); 
+  move_ideas(0, 3); 
+  barrier();
 
-  // copy_field_new_into_field();
   send_top_rows(field_new);
   receive_into_bottom_rows(field_new);
-
-  // pr_logs();
-  // pr_field(field);
-  // pr_field(field_new);
   barrier();
-  // pr_field();
 
-  move_ideas_down(num_rows - 4, 3);  
+  master(prs("DEPENDENT ROWS TOP"));
+  pr_logs();
+  pr_field(field_new);
+
+  // move_ideas_down(num_rows - 4, 3);  
+  move_ideas(num_rows - 4, 3);  
+  barrier();
   send_bottom_rows(field_new);
   receive_into_top_rows(field_new);
-
-  // pr_logs();
-  // pr_field(field);
   barrier();
+
+  master(prs("DEPENDENT ROWS BOTTOM"));
+  pr_logs();
+  pr_field(field_new);
+
   copy_field_new_into_field();
-  // barrier();
+  barrier();
 
-  // pr_logs();
-  // pr_field();
+  master(prs("RESULT"));
+  pr_field(field);
 
 
-  } //endloop
+  }); //endloop
 
   toc();
 
