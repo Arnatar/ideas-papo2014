@@ -118,13 +118,13 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
                 write_idea(neighbor_idea); write("wins.\n");
                 Idea tempIdea = build_winner(neighbor_idea, idea);
                 field[y][x] = tempIdea;
-                field_new[y][x] = tempIdea;
+                field_new[y][x] = idea_dupl(tempIdea);
 
               } else if (wins_over(idea, neighbor_idea)) {
                 write_idea(idea); write("wins.\n");
                 Idea tempIdea = build_winner(idea, neighbor_idea);
                 field_new[new_y][new_x] = tempIdea;
-                field[new_y][new_x] = tempIdea;
+                field[new_y][new_x] = idea_dupl(tempIdea);
               }
             }
             else write("can't compete.\n");

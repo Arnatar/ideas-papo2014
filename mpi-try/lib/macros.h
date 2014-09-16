@@ -166,13 +166,16 @@ for(int x=0; x<size; x++) {              \
 #define close_logfile() \
   fclose(fp);
 
+#define prs(str) _prs(str)
+
 #else
 #define write(...)
 #define write_idea(...)
-#define write_field()
-#define pr_field()
+#define write_field(...)
+#define pr_field(...)
 #define pr_logs()
 #define pr_specific_logs(...)
+#define prs(...)
 
 #define open_logfile_for_writing()
 #define close_logfile();
