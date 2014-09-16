@@ -57,7 +57,7 @@
 
 log/
 out/
-draw/data/
+data/
 *.csv
 *.svg
 .virtualenv
