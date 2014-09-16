@@ -40,6 +40,7 @@ Idea build_winner(Idea winner, Idea loser) {
     } else tempIdea.h = IDEA_MAX - 1;
   } else tempIdea.h = 0;
   return tempIdea;
+}
 
 Idea idea_dupl(Idea i2) {
   Idea i;

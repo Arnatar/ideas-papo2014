@@ -78,6 +78,8 @@ void mpi() {
   char fname[100];
   get_fname(fname, rank);
   FILE *fp;
+  char fname_draw[100];
+  FILE *fp_draw;
 
   tic();
 
@@ -145,6 +147,7 @@ void mpi() {
   master(prs("RESULT"));
   pr_field(field);
 
+  generate_draw_files();
 
   }); //endloop
 

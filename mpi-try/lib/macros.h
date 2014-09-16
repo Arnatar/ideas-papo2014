@@ -311,3 +311,45 @@ for(int x=0; x<size; x++) {              \
         field_new[i][j] = field[i][j]; \
       }                              \
   } 
+
+
+// DRAWING ---------------------------------------------------------------------
+#ifdef DRAW
+
+#define write_draw(...) fprintf(fp, __VA_ARGS__)
+
+#define write_idea_draw(idea)                             \
+  write_draw("%d %d %d %d, ",idea.a, idea.b, idea.c, idea.h) \
+
+// print array of ideas
+#define save_local_field_for_drawing() \
+    for(int i=1; i<num_rows-1; i++) {  \
+      for(int j=0; j<num_cols; j++) {  \
+        Idea idea = field[i][j];       \
+        write_idea_draw(idea);         \
+      }                                \
+      write_newline();                 \
+    }                                  \
+
+#define generate_draw_files()                    \
+  barrier();                                     \
+  get_fname(fname, rank);                        \
+  with_file(fname, {                             \
+    save_local_field_for_drawing();              \
+  });                                            \
+  barrier();                                     \
+  master(                                        \
+    get_draw_fname(fname_draw, i);               \
+    fp_draw = fopen(fname_draw, "a");            \
+    for_every(i, num_ranks, {                    \
+      get_fname(fname, i);                       \
+      append_file_to_other_file(fname, fp_draw); \
+    });                                          \
+    fclose(fp_draw);                             \
+  );                                             \
+
+#else
+#define write_idea_draw()
+#define save_local_field_for_drawing()
+#define generate_draw_files()
+#endif
