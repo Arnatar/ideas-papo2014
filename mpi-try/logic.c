@@ -40,6 +40,42 @@ Idea build_winner(Idea winner, Idea loser) {
     } else tempIdea.h = IDEA_MAX - 1;
   } else tempIdea.h = 0;
   return tempIdea;
+
+Idea idea_dupl(Idea i2) {
+  Idea i;
+  i.a = i2.a;
+  i.b = i2.b;
+  i.c = i2.c;
+  i.h = i2.h;
+  i.empty = i2.empty;
+
+  return i;
+}
+
+void _move_ideas_down(Idea** field, Idea** field_new, int start_row, 
+                int num_rows, int num_cols, int rank) {
+  
+  open_logfile_for_writing();
+  for(int y=start_row+1; y<start_row+num_rows; y++) {
+    for(int x=0; x<num_cols; x++) {
+      if (!field[y][x].empty) {
+        Idea idea = field[y][x];
+        field_new[y+1][x] = idea_dupl(idea);
+          write_idea(idea); write(": row %d, col %d -> ",  y+1,x+1);
+          write(" (%d, %d)\n", y+2, x+1);
+      // pri(&field_new[y][x]);
+      // pri(&field_new[y+1][x]);
+      // pre();
+        field_new[y][x] = idea_empty();
+      }
+
+      // field_new[y][x] = idea_dupl();
+      // field_new[y][x] = idea_empty();
+      // field_new[y][x] = idea_empty();
+    }
+  }
+  close_logfile();
+
 }
 
 void _move_ideas(Idea** field, Idea** field_new, int start_row, 

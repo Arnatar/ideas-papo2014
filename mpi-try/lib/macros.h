@@ -116,7 +116,7 @@ for(int x=0; x<size; x++) {              \
   write("(%d,%d,%d,%d) ",idea.a, idea.b, idea.c, idea.h) \
 
 // print array of ideas
-#define write_field()                                   \
+#define write_field(field)                                   \
     for(int i=0; i<num_rows; i++) {                     \
       for(int j=0; j<num_cols; j++) {                     \
         Idea idea = field[i][j];                        \
@@ -129,11 +129,11 @@ for(int x=0; x<size; x++) {              \
       write_newline();                                  \
     }                                                   \
 
-#define pr_field()            \
+#define pr_field(field)            \
   barrier();                  \
   get_fname(fname, rank);     \
   with_file(fname, {          \
-    write_field();            \
+    write_field(field);            \
   });                         \
   barrier();                  \
   master(                     \
@@ -142,6 +142,7 @@ for(int x=0; x<size; x++) {              \
       prfile(fname);          \
       pre();                  \
     });                       \
+  pre();                  \
   );                          
 
 #define pr_logs() \
@@ -155,6 +156,7 @@ for(int x=0; x<size; x++) {              \
     });                       \
       prs("result:\n");\
   );                          
+
 
 #define pr_specific_logs(j)                  \
   barrier();                                 \
@@ -203,37 +205,37 @@ for(int x=0; x<size; x++) {              \
 #define REAL 6666
 
 
-#define send_real_rows_to_ghost_rows() \
+#define send_real_rows_to_ghost_rows(field) \
   /* send our last real row into top ghost row of the next rank */             \
   send_ideas(field[num_rows-2], next_rank, REAL, req);                         \
   /* send our first real row into the bottom ghost row of the previous rank */ \
   send_ideas(field[1], prev_rank, REAL, req2);                                 \
 
-#define receive_real_rows_into_ghost_rows()                             \
+#define receive_real_rows_into_ghost_rows(field)                             \
   /* receive last real row from previous rank into our top ghost row */ \
   receive_ideas_into(field[0], prev_rank, REAL, req);                   \
   /* receive first real row from next rank into our bottom ghost row */ \
   receive_ideas_into(field[num_rows-1], next_rank, REAL, req2);         \
 
-#define send_top_rows() \
+#define send_top_rows(field) \
   /* send our first ghost row into the bottom real row of the previous rank */ \
   send_ideas(field[0], prev_rank, GHOST, req);                                \
   /* send our first real row into the bottom ghost row of the previous rank */ \
   send_ideas(field[1], prev_rank, REAL, req2);                                 \
 
-#define receive_into_bottom_rows() \
+#define receive_into_bottom_rows(field) \
   /* receive first ghost row from next rank into our bottom real row */ \
   receive_ideas_into(field[num_rows-2], next_rank, GHOST, req);        \
   /* receive first real row from next rank into our bottom ghost row */ \
   receive_ideas_into(field[num_rows-1], next_rank, REAL, req2);         \
 
-#define send_bottom_rows() \
+#define send_bottom_rows(field) \
   /* send our last real row into top ghost row of the next rank */             \
   send_ideas(field[num_rows-2], next_rank, REAL, req3);                         \
   /* send our last ghost row into the top real row of the next rank */         \
   send_ideas(field[num_rows-1], next_rank, GHOST, req4);                       \
 
-#define receive_into_top_rows() \
+#define receive_into_top_rows(field) \
   /* receive last real row from previous rank into our top ghost row */ \
   receive_ideas_into(field[0], prev_rank, REAL, req3);                   \
   /* receive last ghost row from prev rank into our top real row */     \
@@ -249,6 +251,8 @@ for(int x=0; x<size; x++) {              \
 #define move_ideas(start_row, num_rows) \
   _move_ideas(field, field_new, start_row, num_rows, num_cols, rank); \
 
+#define move_ideas_down(start_row, num_rows) \
+  _move_ideas_down(field, field_new, start_row, num_rows, num_cols, rank); \
 
 
 #define move_top_rows() \
