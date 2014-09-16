@@ -13,12 +13,13 @@ all: debug
 
 debug: CFLAGS += -DDEBUG -g
 debug: CFLAGS += -DFAIRCHECKING
+debug: CFLAGS += -DFAIRMOVEMENT
 debug: build_executable
 debug: procs=2
-debug: x=2
-debug: y=8
-debug: rounds=5
-debug: ideas=3
+debug: x=4
+debug: y=20
+debug: rounds=100
+debug: ideas=10
 debug: run
 
 
