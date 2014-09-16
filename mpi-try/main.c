@@ -27,12 +27,13 @@ void mpi() {
   char* _x = getenv("x");
   char* _y = getenv("y");
   char* _rounds = getenv("rounds");
+  char* _ideas = getenv("ideas");
 
-  int global_num_rows= _y ? atoi(_y) : 24;
+  int global_num_rows= _y ? atoi(_y) : 44;
   // it segfaults for big col values
   int global_num_cols= _x ? atoi(_x) : 4;
   int rounds= _rounds ? atoi(_rounds) : 4;
-  int global_num_ideas=global_num_cols*global_num_rows/3;
+  int global_num_ideas= _ideas ? atoi(_ideas) : global_num_cols*global_num_rows/3;
 
   int row_amount_distribution[num_ranks];
   get_distribution(row_amount_distribution, num_ranks, global_num_rows);

@@ -17,7 +17,7 @@ void pri(int i) {
   printf("%d\n", i);
 }
 
-void prs(char* s) {
+void _prs(char* s) {
   printf("%s\n",s);
 }
 
