@@ -17,7 +17,7 @@ void pri(int i) {
   printf("%d\n", i);
 }
 
-void prs(char* s) {
+void _prs(char* s) {
   printf("%s\n",s);
 }
 
@@ -36,11 +36,24 @@ void prfile(char* fname) {
       fclose(file);
   }
 }
+void append_file_to_other_file(char* fname, FILE* target_f) {
+  int c;
+  FILE *file;
+  file = fopen(fname, "r");
+  if (file) {
+      while ((c = getc(file)) != EOF)
+          fputc(c, target_f);
+      fclose(file);
+  }
+}
 
 void get_log_fname(char* fname, int rank) {
   sprintf(fname, "log/%d", rank);
 }
 
+void get_draw_fname(char* fname, int iteration) {
+  sprintf(fname, "draw/data/%d", iteration);
+}
 
 void get_fname(char* fname, int rank) {
   sprintf(fname, "out/%d", rank);
