@@ -15,7 +15,7 @@ typedef struct {
 Idea idea_new()
 {
   Idea i;
-  i.a = rand_int(IDEA_MAX, 0);
+  i.a = rand_int(IDEA_MAX / 3, 0);
   // complex should depend on qual
   int tempb = i.a + rand_int(3, -1);
   if (0 <= tempb) {

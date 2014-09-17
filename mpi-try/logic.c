@@ -7,13 +7,21 @@
 // b idea complex
 // c idea worldview
 // h human worldview
+// slowed with chance
 int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
+  int complxdif = abs(i1.b - i2.b);
+  #ifdef DRAW
+  int chance = complxdif * rand_int(10000, 0);
+  #endif
   if(abs((i1.c - i2.h)) > 4 || abs((i2.c - i1.h)) > 4) {
     convinceable = 0;
-  } else if(abs(i1.b - i2.b) > 5) {
+  } else if(complxdif > 3) {
     convinceable = 0;
   }
+  #ifdef DRAW
+  if(chance > 500) convinceable = 0;
+  #endif
   return convinceable;
 } 
 
@@ -44,6 +52,61 @@ Idea construct_looser_idea(Idea winner, Idea loser) {
     } else tempIdea.h = IDEA_MAX - 1;
   } else tempIdea.h = 0;
   return tempIdea;
+}
+
+// idea mutation
+Idea mutate(Idea idea) {
+  if(rand_int(10000, 0) < 50) {
+    int direction = rand_int(3, -1);
+    // quali
+    int adjust = idea.a + direction * rand_int(2, 1);
+    if (0 <= adjust) {
+      if (adjust < IDEA_MAX) {
+        idea.a = adjust;
+      } 
+      else idea.a = IDEA_MAX - 1;
+    } 
+    else idea.a = 0;
+    // complxty
+    adjust = idea.b + direction * rand_int(2, 1);
+    if (0 <= adjust) {
+      if (adjust < IDEA_MAX) {
+        idea.b = adjust;
+      } 
+      else idea.b = IDEA_MAX - 1;
+    } 
+    else idea.b = 0;
+  }
+  if(rand_int(10000, 0) < 25) {
+    int direction = rand_int(3, -1);
+    // worldview idea
+    int adjust = idea.c + direction * rand_int(2, 1);
+    int tempc = 0;
+    if (0 <= adjust) {
+      if (adjust < IDEA_MAX) {
+        tempc = adjust;
+      } 
+      else tempc = IDEA_MAX - 1;
+    } 
+    else tempc = 0;
+
+    //worldview human
+    adjust = idea.h + direction * rand_int(2, 1);
+    int temph = 0;
+    if (0 <= adjust) {
+      if (adjust < IDEA_MAX) {
+        temph = adjust;
+      } 
+      else temph = IDEA_MAX - 1;
+    } 
+    else temph = 0;
+
+    if(abs(tempc - temph) < 4) {
+      idea.c = tempc;
+      idea.h = temph;
+    }
+  }
+  return idea;
 }
 
 /*
@@ -84,6 +147,9 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
         int new_x = 0; 
         int new_y = 0; 
         int having_neighbors = 0;
+
+        // ----------mutation---------
+        idea = mutate(idea); 
 
         // ----------check for neighbors----------
         // unfair checking, first found, first serve

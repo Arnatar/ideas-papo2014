@@ -31,7 +31,7 @@ class Draw():
 
     def init_pygame(self):
         pygame.init()
-        pygame.display.set_caption('Hello world!')
+        pygame.display.set_caption('Ideas')
         self.screen = pygame.display.set_mode((AMOUNT*SIZE,AMOUNT*SIZE), 0, 32)
         self.clock = pygame.time.Clock()
 
