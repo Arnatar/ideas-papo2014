@@ -12,7 +12,7 @@ int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
   int complxdif = abs(i1.b - i2.b);
   #ifdef DRAW
-  int chance = complxdif * rand_int(20000, 0);
+  int chance = complxdif * rand_int(10000, 0);
   #endif
   if(abs((i1.c - i2.h)) > 3 || abs((i2.c - i1.h)) > 3) {
     convinceable = 0;
@@ -20,7 +20,7 @@ int can_compete(Idea i1, Idea i2) {
     convinceable = 0;
   }
   #ifdef DRAW
-  if(chance > 1000) convinceable = 0;
+  if(chance > 2000) convinceable = 0;
   #endif
   return convinceable;
 } 

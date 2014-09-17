@@ -6,7 +6,7 @@ include_paths=-Ilib/ -Iheaders/lib/ -Iheaders/ -I.
 library_paths=-lrt -Llib
 procs=4
 
-CFLAGS=-std=c99
+CFLAGS=-std=c99 -O3
 
 # this is the default config, runs when you call "make"
 all: debug
@@ -29,11 +29,13 @@ pygame: CFLAGS += -DFAIRCHECKING
 pygame: setup_draw_data_folder
 pygame: build_executable
 pygame: procs=2
-pygame: x=50
-pygame: y=50
+pygame: x=100
+pygame: y=100
 pygame: rounds=2500
-pygame: ideas=150
+pygame: ideas=400
+pygame: framerate=40
 pygame: run
+pygame: run_draw
 
 build_executable: setup_folders
 	mpicc $(CFLAGS) $(f) $(library_paths) $(include_paths) -include allheads.h 
@@ -52,3 +54,6 @@ setup_folders:
 run:
 	x=$(x) y=$(y) ideas=$(ideas) rounds=$(rounds) mpirun -np $(procs) ./a.out
 
+run_draw:
+	x=$(x) y=$(y) framerate=$(framerate) python2 draw/draw.py
+	
