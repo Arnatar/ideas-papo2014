@@ -1,3 +1,4 @@
+from itertools import chain
 from pprint import pprint
 import pygame, sys
 from pygame.locals import *
@@ -36,7 +37,7 @@ class Draw():
         self.clock = pygame.time.Clock()
 
     def draw_point(self,x,y, qual):
-        color=25*qual
+        color=255-25*qual
         draw.rect(self.screen, (color,color,color), [x, y, SIZE, SIZE])
 
     def print_step(self, nr):
@@ -61,21 +62,22 @@ class Draw():
         done=False
         tic=0
         step=0
+        last_unique_count=0
         while not done:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     done = True
 
-            self.screen.fill(BLACK)
-
-            # pygame.display.flip()
-            # self.clock.tick(1)
-            # tic+=1
-            # if tic == 100:
-            #     step+=1
-            #     tic=0
+            self.screen.fill((191,184,114))
 
             self.print_step(step)
+            this_unique_count = self.uniques(step)
+
+            if last_unique_count: 
+                if this_unique_count != last_unique_count:
+                    print(last_unique_count, this_unique_count)
+
+            last_unique_count = this_unique_count
 
 
 
@@ -89,14 +91,22 @@ class Draw():
             # self.draw_point(10+x,10)
 
             pygame.display.flip()
-            self.clock.tick(30)
+            self.clock.tick(20)
 
             step+=1
             if step > len(self.data)-2: done = True
 
 
-        pprint([(k,v) for k,v in self.doubles.items() if v>5])
+        # pprint([(k,v) for k,v in self.doubles.items() if v>5])
         pygame.quit()
+
+    def uniques(self,nr):
+        step = self.data[nr]
+        flattened = chain(*step)
+        uniques_count = len([i for i in flattened if not i == [0,0,0,0]])
+        return uniques_count
+
+
 
 
 
