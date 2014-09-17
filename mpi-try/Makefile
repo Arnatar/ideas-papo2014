@@ -31,8 +31,8 @@ pygame: build_executable
 pygame: procs=2
 pygame: x=50
 pygame: y=50
-pygame: rounds=4000
-pygame: ideas=1
+pygame: rounds=2500
+pygame: ideas=150
 pygame: run
 
 build_executable: setup_folders
