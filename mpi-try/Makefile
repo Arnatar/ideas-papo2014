@@ -28,10 +28,10 @@ pygame: CFLAGS += -DFAIRCHECKING
 # pygame: CFLAGS += -DDRAW
 pygame: setup_draw_data_folder
 pygame: build_executable
-pygame: procs=2
-pygame: x=120
-pygame: y=120
-pygame: rounds=1000
+pygame: procs=6
+pygame: x=50
+pygame: y=50
+pygame: rounds=500
 pygame: ideas=125
 pygame: framerate=5
 pygame: run
