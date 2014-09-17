@@ -20,10 +20,10 @@ Idea idea_new()
     i.a = rand_int(IDEA_MAX, 0);
   }
   else if(chance < 100) {
-    i.a = rand_int((int) (IDEA_MAX * 0.75), 0);
+    i.a = rand_int((int) (IDEA_MAX * 0.66), 0);
   }
   else {
-    i.a = rand_int((int) (IDEA_MAX * 0.25), 0);
+    i.a = rand_int((int) (IDEA_MAX * 0.33), 0);
   }
 
   // complex should depend on qual

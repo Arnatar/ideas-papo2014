@@ -11,17 +11,13 @@
 int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
   int complxdif = abs(i1.b - i2.b);
-  #ifdef DRAW
-  int chance = complxdif * rand_int(10000, 0);
-  #endif
+  int chance = (complxdif + 1) * rand_int(10000, 0);
   if(abs((i1.c - i2.h)) > 3 || abs((i2.c - i1.h)) > 3) {
     convinceable = 0;
   } else if(complxdif > 4) {
     convinceable = 0;
   }
-  #ifdef DRAW
-  if(chance > 2000) convinceable = 0;
-  #endif
+  if(chance > 1000) convinceable = 0;
   return convinceable;
 } 
 
@@ -96,8 +92,8 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
         // ----------mutation---------
         // quali & cmplxty
         if(rand_int(100000, 0) < 50) {
-          int direction = rand_int(3, -1);
-          //if(direction < -1) direction = -1;
+          int direction = rand_int(4, -2);
+          if(direction <= 0) direction = -1;
           // quali
           int adjust = idea.a + direction * rand_int(3, 1);
           if (0 <= adjust) {
