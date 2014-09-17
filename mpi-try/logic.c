@@ -12,15 +12,15 @@ int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
   int complxdif = abs(i1.b - i2.b);
   #ifdef DRAW
-  int chance = complxdif * rand_int(10000, 0);
+  int chance = complxdif * rand_int(20000, 0);
   #endif
-  if(abs((i1.c - i2.h)) > 4 || abs((i2.c - i1.h)) > 4) {
+  if(abs((i1.c - i2.h)) > 3 || abs((i2.c - i1.h)) > 3) {
     convinceable = 0;
   } else if(complxdif > 4) {
     convinceable = 0;
   }
   #ifdef DRAW
-  if(chance > 2000) convinceable = 0;
+  if(chance > 1000) convinceable = 0;
   #endif
   return convinceable;
 } 
@@ -95,8 +95,9 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
 
         // ----------mutation---------
         // quali & cmplxty
-        if(rand_int(10000, 0) < 10) {
+        if(rand_int(100000, 0) < 50) {
           int direction = rand_int(3, -1);
+          //if(direction < -1) direction = -1;
           // quali
           int adjust = idea.a + direction * rand_int(3, 1);
           if (0 <= adjust) {
@@ -117,7 +118,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           else idea.b = 0;
         }
         // worldviews
-        if(rand_int(10000, 0) < 5) {
+        if(rand_int(100000, 0) < 10) {
           int direction = rand_int(3, -1);
           // worldview idea
           int adjust = idea.c + direction * rand_int(2, 1);
