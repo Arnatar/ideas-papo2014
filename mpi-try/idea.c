@@ -25,6 +25,7 @@ Idea idea_new()
   else {
     i.a = rand_int((int) (IDEA_MAX * 0.33), 0);
   }
+  // i.a = rand_int(IDEA_MAX, 0);
 
   // complex should depend on qual
   int tempb = i.a + rand_int(3, -1);

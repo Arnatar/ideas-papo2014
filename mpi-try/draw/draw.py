@@ -1,17 +1,38 @@
+from __future__ import division
 from math import floor
 from itertools import chain
 from pprint import pprint
 import pygame, sys
 from pygame.locals import *
 from pygame import draw
+from pygame.color import Color
 import os
 from os.path import basename
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+black = (0, 0, 0)
+
+blue="#0074D9"
+teal="#39CCCC"
+
+yellow="#FFDC00"
+orange="#FF851B"
+red="#FF4136"
+
+maroon="#85144B"
+fuchsia="#F012BE"
+
+olive="#3D9970"
+lime="#01FF70"
+
+grey="#AAAAAA"
+
+colors=map(Color, [blue, teal, yellow, orange, red, maroon, fuchsia, olive, lime, grey])
+
+def dim(color, factor):
+    return tuple([int(c*factor) for c in color])
+
+# print(dim(colors[0],1))
+# print(dim(colors[0],.5))
 
 framerate=int(os.getenv("framerate", 15))
 
@@ -52,19 +73,28 @@ class Draw():
         self.screen = pygame.display.set_mode((AMOUNT*SIZE,AMOUNT*SIZE), 0, 32)
         self.clock = pygame.time.Clock()
 
-    def draw_point(self,x,y, qual):
-        color=255-25*qual
-        draw.rect(self.screen, (color,color,color), [x, y, SIZE, SIZE])
+    def color_scale_intensity(self, value):
+        # higher value = darker
+        return 255 - 25*value
+
+
+    def draw_point(self,x,y, idea):
+        quali, complx, wv, human_wv = idea
+        # R=self.color_scale_intensity(complx)
+        # R=self.color_scale_intensity(complx)
+        color = dim(colors[wv], quali/9)
+        draw.rect(self.screen, color, [x, y, SIZE, SIZE])
 
     def print_step(self, step_data):
         for y, row in enumerate(step_data):
             for x, col in enumerate(row):
                 if col != [0,0,0,0]:
-                    self.draw_point(SIZE*x,SIZE*y, col[0])
+                    self.draw_point(SIZE*x,SIZE*y, col)
 
     def run(self):
+        unique_wvs_last=10
 
-        for fname in self.files_sorted:
+        for step_nr, fname in enumerate(self.files_sorted):
             # get data from file ---------------------------------------------------
             with open(fname) as f:
                 file_raw_data = f.read().split("\n")[:-1]
@@ -75,11 +105,17 @@ class Draw():
                             for nums in line.split(",")[:-1]])
 
             # draw on screen -------------------------------------------------------
-            self.screen.fill((191,184,114))
+            self.screen.fill(black)
             self.print_step(step_data)
             pygame.display.flip()
 
             self.clock.tick(framerate)
+
+            unique_wvs = self.unique_wvs(step_data)
+            if unique_wvs_last and unique_wvs != unique_wvs_last:
+                print("round {}: {} unique wv's".format(
+                    step_nr,self.unique_wvs(step_data)))
+            unique_wvs_last = unique_wvs
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -88,8 +124,13 @@ class Draw():
 
         pygame.quit()
 
+    def unique_wvs(self, step_data):
+        return len(set(idea[2] for idea in chain(*step_data)))
+
+
 # main -------------------------------------------------------------------------
 Draw(files_sorted)
+
 
 
 
