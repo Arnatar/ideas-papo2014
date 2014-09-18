@@ -31,7 +31,7 @@ pygame: build_executable
 pygame: procs=2
 pygame: x=100
 pygame: y=100
-pygame: rounds=2500
+pygame: rounds=6000
 pygame: ideas=400
 pygame: framerate=40
 pygame: run

@@ -12,20 +12,20 @@ int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
   int complxdif = abs(i1.b - i2.b);
   int chance = (complxdif + 1) * rand_int(10000, 0);
-  if(abs((i1.c - i2.h)) > 3 || abs((i2.c - i1.h)) > 3) {
+  if(abs((i1.c - i2.h)) > 4 || abs((i2.c - i1.h)) > 4) {
     convinceable = 0;
   } else if(complxdif > 4) {
     convinceable = 0;
   }
-  if(chance > 1000) convinceable = 0;
+  if(chance > 2000) convinceable = 0;
   return convinceable;
 } 
 
 // winner check with
 // a idea quali
 int wins_over(Idea i1, Idea i2) {
-  int i1quali = i1.a + rand_int(5, -2);
-  int i2quali = i2.a + rand_int(5, -2);
+  int i1quali = i1.a + rand_int(15, -8);
+  int i2quali = i2.a + rand_int(15, -8);
   int first_wins = i1quali >= i2quali;
   return first_wins;
 }
