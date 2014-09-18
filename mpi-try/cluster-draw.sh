@@ -27,9 +27,6 @@ echo ""
 # exit
 ENDSSH
 
-# echo -e "\n[3] copying draw/data/* to local folder ...\n"
-# _rsync cluster:/home/$cluster_username/mpi-try/draw/data/* draw/data/
-# echo -e "\nFolder size draw/data: $(du -sh draw/data/ | awk ' { print $1 }').\n"
-
-
-
+echo -e "\n[3] copying draw/data/* to local folder ...\n"
+_rsync cluster:/home/$cluster_username/mpi-try/draw/data/* draw/data/
+echo -e "\nFolder size draw/data: $(du -sh draw/data/ | awk ' { print $1 }').\n"

@@ -77,5 +77,3 @@ run:
 
 run_draw:
 	x=$(x) y=$(y) export_gif=$(export_gif) framerate=$(framerate) rounds=$(rounds) procs=$(procs) outfile=$(outfile) python2 draw/draw.py
-
-run_cluster_script:
