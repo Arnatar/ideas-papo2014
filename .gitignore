@@ -58,8 +58,10 @@
 log/
 out/
 data/
+tmp/
 *.csv
 *.svg
 .virtualenv
 run
 *.pyc
+

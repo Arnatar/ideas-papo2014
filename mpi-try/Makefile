@@ -22,23 +22,39 @@ debug: rounds=150
 debug: ideas=20
 debug: run
 
-pygame: CFLAGS += -DDRAW
+# pygame: CFLAGS += -DDRAW
 pygame: CFLAGS += -DFAIRMOVEMENT
 pygame: CFLAGS += -DFAIRCHECKING
-# pygame: CFLAGS += -DDRAW
 pygame: setup_draw_data_folder
-pygame: procs=6
-pygame: x=50
-pygame: y=50
-pygame: rounds=500
-pygame: ideas=225
-pygame: framerate=5
+pygame: procs=4
+pygame: x=2000
+pygame: y=4000
+pygame: rounds=120
+pygame: ideas=200
+pygame: framerate=15
+pygame: export_gif=0
+pygame: outfile=out2.gif
 pygame: build_executable
 pygame: run
 pygame: run_draw
 
-# cluster: setup_draw_data_folder
+# the build script for the cluster
+# (is not meant to be called locally. gets called by ./cluster-draw.sh
+cluster: CFLAGS += -DDRAW
+cluster: CFLAGS += -DFAIRMOVEMENT
+cluster: CFLAGS += -DFAIRCHECKING
+cluster: setup_draw_data_folder
+cluster pygame_cluster: x=2000
+cluster pygame_cluster: y=4000
+cluster pygame_cluster: rounds=120
+cluster pygame_cluster: ideas=200
+cluster pygame_cluster: procs=32
 cluster: build_executable
+cluster: run
+
+# the command to run the build on the cluster and get pygame happening locally
+pygame_cluster: setup_draw_data_folder
+	procs=$(procs) ./cluster-draw.sh
 
 build_executable: setup_folders
 	mpicc $(CFLAGS) $(f) $(library_paths) $(include_paths) -include allheads.h 
@@ -46,6 +62,8 @@ build_executable: setup_folders
 
 setup_draw_data_folder:
 	mkdir -p draw/data
+	mkdir -p draw/tmp
+	mkdir -p draw/out
 	rm -rf draw/data/*
 
 setup_folders:
@@ -58,5 +76,6 @@ run:
 	x=$(x) y=$(y) ideas=$(ideas) rounds=$(rounds) mpirun -np $(procs) ./a.out
 
 run_draw:
-	x=$(x) y=$(y) framerate=$(framerate) python2 draw/draw.py
-	
+	x=$(x) y=$(y) export_gif=$(export_gif) framerate=$(framerate) rounds=$(rounds) procs=$(procs) outfile=$(outfile) python2 draw/draw.py
+
+run_cluster_script:
