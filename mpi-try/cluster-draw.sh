@@ -1,4 +1,3 @@
-# [[ $@ ]] || { echo "usage: measure.sh [name-of-measurement]"; exit 1; }
 # how to run this --------------------------------------------------------------
 # 1. add the following to ~/.ssh/config :
 # Host cluster
