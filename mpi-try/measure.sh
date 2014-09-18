@@ -20,7 +20,7 @@ max_ranks=12
 
 # global field size
 x=2000
-y=60000
+y=6000
 rounds=1
 num_attributes=4
 int_size=4
@@ -28,7 +28,7 @@ size_bytes=$((x*y*int_size*num_attributes))
 size_gb=$(bc <<< "scale=2; $size_bytes/1024^3")
 #-------------------------------------------------------------------------------
 # sync the project folder to the cluster
-rsync -a --delete --exclude presentation --exclude src --exclude '.git' ../* cluster:/home/$cluster_username/ideas/ 2>/dev/null
+rsync -a --delete * cluster:/home/$cluster_username/mpi-try/
 
 cells=$(pprint $((x*y)))
 echo -e "\n Running with $cells cells ($size_gb GB)"
@@ -37,8 +37,7 @@ measurements_file=measurements/$1.csv
 
 ssh cluster rounds=$rounds x=$x y=$y min_rank=$min_rank max_ranks=$max_ranks measurements_file=$measurements_file "bash -s" << 'ENDSSH'
 cd ideas
-make slurm > /dev/null
-cd mpi-try
+make cluster
 
 echo ""
 rm -f $measurements_file

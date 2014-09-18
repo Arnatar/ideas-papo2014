@@ -27,15 +27,18 @@ pygame: CFLAGS += -DFAIRMOVEMENT
 pygame: CFLAGS += -DFAIRCHECKING
 # pygame: CFLAGS += -DDRAW
 pygame: setup_draw_data_folder
-pygame: build_executable
 pygame: procs=6
 pygame: x=50
 pygame: y=50
 pygame: rounds=500
-pygame: ideas=125
+pygame: ideas=225
 pygame: framerate=5
+pygame: build_executable
 pygame: run
 pygame: run_draw
+
+# cluster: setup_draw_data_folder
+cluster: build_executable
 
 build_executable: setup_folders
 	mpicc $(CFLAGS) $(f) $(library_paths) $(include_paths) -include allheads.h 
