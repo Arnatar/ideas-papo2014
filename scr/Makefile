@@ -28,13 +28,13 @@ pygame: CFLAGS += -DFAIRMOVEMENT
 pygame: CFLAGS += -DFAIRCHECKING
 pygame: setup_draw_data_folder
 pygame: procs=4
-pygame: x=150
-pygame: y=150
-pygame: rounds=2000
-pygame: ideas=400
-pygame: framerate=14
+pygame: x=100
+pygame: y=100
+pygame: rounds=200
+pygame: ideas=500
+pygame: framerate=25
 pygame: export_gif=1
-pygame: outfile=out2.gif
+pygame: outfile=out.gif
 pygame: build_executable
 pygame: run
 pygame: run_draw
