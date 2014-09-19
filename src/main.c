@@ -57,7 +57,7 @@ void mpi() {
 
   fill_matrix_with(field, num_rows, num_cols, idea_empty());
 
-  // // spawn ideas (the random y-value for field excludes the ghost rows
+  // spawn ideas (the random y-value for field excludes the ghost rows
   for_every(i, num_ideas, 
       field[rand_int(num_rows-2,1)][rand_int(num_cols,0)] = idea_new());
 
@@ -66,7 +66,7 @@ void mpi() {
 	const int prev_rank = rank == 0 ? num_ranks -1 : rank - 1;
 
 
-  // // fill all ghost rows
+  // fill all ghost rows
   MPI_Request req, req2, req3, req4;
   send_real_rows_to_ghost_rows(field);
   receive_real_rows_into_ghost_rows(field);
@@ -83,34 +83,21 @@ void mpi() {
   FILE *fp_draw;
 
   tic();
-  //pr_field();
   for_every(i, rounds, {
     master(pr("ROUND %d =================================", i));
     generate_draw_files();
     pr_field(field_new);
-  // // movement ------------------------------------------------------------------
-  // // serial: move all ideas which do not depend on other ranks. 
-  // // then: 1) move all outer ideas from even ranks. 
-  // //       1b) communicate to uneven ranks.
-  // //       2) move all outer ideas from uneven ranks
-  // //       2b) communicate to even ranks.
-  // // send ideas ----------------------------------------------------------------
 
-
-  // // INDEPENDENT MOVEMENT
-  // // reason for 7: 1 row in center, can move up or down without touching a dependent
-  // // row. from the outer sides: 1 ghost row, 2 dependent rows each = 3*2. the next
-  // // row above 6 is the first independent row. 
-  // // [2]: give the independent movement procedure all rows starting from the 
-  // //      third, until the third last. if num_rows = 8, num_rows-4 = 4. that means:
-  // // take 3 rows from the array (the for loop is not inclusive).
-  // // so for a matrix with 8 rows we take (0-based) rows 2,3,4,5. 0+1 and 6+7 are 
-  // // left out.
-
-
-
+  // INDEPENDENT MOVEMENT
+  // reason for 7: 1 row in center, can move up or down without touching a dependent
+  // row. from the outer sides: 1 ghost row, 2 dependent rows each = 3*2. the next
+  // row above 6 is the first independent row. 
+  // [2]: give the independent movement procedure all rows starting from the 
+  //      third, until the third last. if num_rows = 8, num_rows-4 = 4. that means:
+  // take 3 rows from the array (the for loop is not inclusive).
+  // so for a matrix with 8 rows we take (0-based) rows 2,3,4,5. 0+1 and 6+7 are 
+  // left out.
   if (num_rows >= 7) {
-    // move_ideas_down(2, num_rows-5);
     move_ideas(2, num_rows-5);
   }
   barrier();
@@ -120,7 +107,9 @@ void mpi() {
   // pr_logs();
   // pr_field(field_new);
 
-  // move_ideas_down(0, 3); 
+
+
+  // DEPENDENT ROWS TOP
   move_ideas(0, 3); 
   barrier();
 
@@ -136,14 +125,13 @@ void mpi() {
   // pr_logs();
   // pr_field(field_new);
 
-  // move_ideas_down(num_rows - 4, 3);  
+  // DEPENDENT ROWS BOTTOM
   move_ideas(num_rows - 4, 3);  
   barrier();
 
   send_bottom_rows(field_new);
   receive_into_top_rows(field_new);
   barrier();
-
 
   // master(prs("DEPENDENT ROWS BOTTOM"));
   // pr_logs();
