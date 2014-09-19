@@ -1,6 +1,5 @@
 #ifndef __idea_h__
 #define __idea_h__
-//#define HTEST
 
 #include "constants.h"
 
@@ -25,7 +24,6 @@ Idea idea_new()
   else {
     i.a = rand_int((int) (IDEA_MAX * 0.33), 0);
   }
-  // i.a = rand_int(IDEA_MAX, 0);
 
   // complex should depend on qual
   int tempb = i.a + rand_int(3, -1);
@@ -37,7 +35,6 @@ Idea idea_new()
   } 
   else i.b = 0;
 
-  #ifndef HTEST
   // first human worldview based on its init idea worldview
   i.c = rand_int(IDEA_MAX, 0);  
   int temph = i.c + rand_int(5, -2);
@@ -50,20 +47,6 @@ Idea idea_new()
   else i.h = 0;
 
   i.empty = 0;
-  #endif
-  #ifdef HTEST
-  int test = rand_int(3, 0);
-  if (test == 0) {
-    i.c = 1;
-    i.h = 1;
-  } else if (test == 1) {
-    i.c = 5;
-    i.h = 5;
-  } else if (test == 2) {
-    i.c = 9;
-    i.h = 9;
-  }
-  #endif
   return i;
 }
 

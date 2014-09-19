@@ -7,7 +7,7 @@
 // b idea complex
 // c idea worldview
 // h human worldview
-// slowed with chance
+// slowed with chance, the higher the complxdifferenz, the harder to get
 int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
   int complxdif = abs(i1.b - i2.b);
@@ -49,26 +49,6 @@ Idea construct_looser_idea(Idea winner, Idea loser) {
   } else tempIdea.h = 0;
   return tempIdea;
 }
-
-/*
-Test Method
-void _move_ideas_down(Idea** field, Idea** field_new, int start_row, 
-                int num_rows, int num_cols, int rank) {
-  
-  open_logfile_for_writing();
-  for(int y=start_row+1; y<start_row+num_rows; y++) {
-    for(int x=0; x<num_cols; x++) {
-      if (!field[y][x].empty) {
-        Idea idea = field[y][x];
-        field_new[y+1][x] = idea_dupl(idea);
-          write_idea(idea); write(": row %d, col %d -> ",  y+1,x+1);
-          write(" (%d, %d)\n", y+2, x+1);
-        field_new[y][x] = idea_empty();
-      }
-    }
-  }
-  close_logfile();
-} */
 
 
 // Idea-Movement, 1 rank
