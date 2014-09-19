@@ -287,7 +287,7 @@ for(int x=0; x<size; x++) {              \
   gettimeofday(&end_time,NULL);                                         \
   end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
   diff=end_dtime-start_dtime;                                           \
-  master(pr("%f", diff));
+  master(printf("\nIt took %f seconds.\n\n", diff));
 // temp
 #define prf(field) \
   for_every(i, num_rows, { \
@@ -341,20 +341,10 @@ for(int x=0; x<size; x++) {              \
 
 #define generate_draw_files()                    \
   barrier();                                     \
-  get_fname(fname, rank);                        \
+  get_draw_fname(fname, rank,i);               \
   with_file(fname, {                             \
     save_local_field_for_drawing();              \
   });                                            \
-  barrier();                                     \
-  master(                                        \
-    get_draw_fname(fname_draw, i);               \
-    fp_draw = fopen(fname_draw, "a");            \
-    for_every(i, num_ranks, {                    \
-      get_fname(fname, i);                       \
-      append_file_to_other_file(fname, fp_draw); \
-    });                                          \
-    fclose(fp_draw);                             \
-  );                                             \
 
 #else
 #define write_idea_draw()

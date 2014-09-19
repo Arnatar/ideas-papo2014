@@ -51,8 +51,8 @@ void get_log_fname(char* fname, int rank) {
   sprintf(fname, "log/%d", rank);
 }
 
-void get_draw_fname(char* fname, int iteration) {
-  sprintf(fname, "draw/data/%d", iteration);
+void get_draw_fname(char* fname, int rank, int iteration) {
+  sprintf(fname, "draw/data/%d-%d", iteration, rank);
 }
 
 void get_fname(char* fname, int rank) {
