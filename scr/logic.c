@@ -7,21 +7,25 @@
 // b idea complex
 // c idea worldview
 // h human worldview
+// slowed with chance, the higher the complxdifferenz, the harder to get
 int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
+  int complxdif = abs(i1.b - i2.b);
+  int chance = (complxdif + 1) * rand_int(10000, 0);
   if(abs((i1.c - i2.h)) > 4 || abs((i2.c - i1.h)) > 4) {
     convinceable = 0;
-  } else if(abs(i1.b - i2.b) > 5) {
+  } else if(complxdif > 4) {
     convinceable = 0;
   }
+  if(chance > 2000) convinceable = 0;
   return convinceable;
 } 
 
 // winner check with
 // a idea quali
 int wins_over(Idea i1, Idea i2) {
-  int i1quali = i1.a + rand_int(5, -2);
-  int i2quali = i2.a + rand_int(5, -2);
+  int i1quali = i1.a + rand_int(15, -8);
+  int i2quali = i2.a + rand_int(15, -8);
   int first_wins = i1quali >= i2quali;
   return first_wins;
 }
@@ -46,26 +50,6 @@ Idea construct_looser_idea(Idea winner, Idea loser) {
   return tempIdea;
 }
 
-/*
-Test Method
-void _move_ideas_down(Idea** field, Idea** field_new, int start_row, 
-                int num_rows, int num_cols, int rank) {
-  
-  open_logfile_for_writing();
-  for(int y=start_row+1; y<start_row+num_rows; y++) {
-    for(int x=0; x<num_cols; x++) {
-      if (!field[y][x].empty) {
-        Idea idea = field[y][x];
-        field_new[y+1][x] = idea_dupl(idea);
-          write_idea(idea); write(": row %d, col %d -> ",  y+1,x+1);
-          write(" (%d, %d)\n", y+2, x+1);
-        field_new[y][x] = idea_empty();
-      }
-    }
-  }
-  close_logfile();
-} */
-
 
 // Idea-Movement, 1 rank
 void _move_ideas(Idea** field, Idea** field_new, int start_row, 
@@ -84,6 +68,61 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
         int new_x = 0; 
         int new_y = 0; 
         int having_neighbors = 0;
+
+        // ----------mutation---------
+        // quali & cmplxty
+        if(rand_int(100000, 0) < 50) {
+          int direction = rand_int(4, -2);
+          if(direction <= 0) direction = -1;
+          // quali
+          int adjust = idea.a + direction * rand_int(3, 1);
+          if (0 <= adjust) {
+            if (adjust < IDEA_MAX) {
+              idea.a = adjust;
+            } 
+            else idea.a = IDEA_MAX - 1;
+          } 
+          else idea.a = 0;
+          // complxty
+          adjust = idea.b + direction * rand_int(3, 1);
+          if (0 <= adjust) {
+            if (adjust < IDEA_MAX) {
+              idea.b = adjust;
+            } 
+            else idea.b = IDEA_MAX - 1;
+          } 
+          else idea.b = 0;
+        }
+        // worldviews
+        if(rand_int(100000, 0) < 10) {
+          int direction = rand_int(3, -1);
+          // worldview idea
+          int adjust = idea.c + direction * rand_int(2, 1);
+          int tempc = 0;
+          if (0 <= adjust) {
+            if (adjust < IDEA_MAX) {
+              tempc = adjust;
+            } 
+            else tempc = IDEA_MAX - 1;
+          } 
+          else tempc = 0;
+
+          //worldview human
+          adjust = idea.h + direction * rand_int(2, 1);
+          int temph = 0;
+          if (0 <= adjust) {
+            if (adjust < IDEA_MAX) {
+              temph = adjust;
+            } 
+            else temph = IDEA_MAX - 1;
+          } 
+          else temph = 0;
+
+          if(abs(tempc - temph) < 4) {
+            idea.c = tempc;
+            idea.h = temph;
+          }
+        } 
 
         // ----------check for neighbors----------
         // unfair checking, first found, first serve

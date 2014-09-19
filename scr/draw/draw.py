@@ -67,7 +67,7 @@ if y==0 or x==0 or rounds==0 or procs==0:
 
 AMOUNT = y if y >= x else x
 
-y_resolution = 800
+y_resolution = 700  
 
 # size of one piece
 SIZE=int(floor(y_resolution/AMOUNT))
@@ -97,7 +97,7 @@ class Draw():
 
     def init_pygame(self):
         pygame.init()
-        pygame.display.set_caption('Hello world!')
+        pygame.display.set_caption('Ideas')
         self.screen = pygame.display.set_mode((AMOUNT*SIZE,AMOUNT*SIZE), 0, 32)
         self.clock = pygame.time.Clock()
         self.completed_rounds = 0

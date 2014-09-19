@@ -16,10 +16,10 @@ debug: CFLAGS += -DFAIRMOVEMENT
 debug: CFLAGS += -DFAIRCHECKING
 debug: build_executable
 debug: procs=2
-debug: x=4
-debug: y=20
+debug: x=2
+debug: y=8
 debug: rounds=150
-debug: ideas=20
+debug: ideas=2
 debug: run
 
 # for gif export: dependency: "imagemagick"
@@ -30,7 +30,7 @@ pygame: setup_draw_data_folder
 pygame: procs=4
 pygame: x=150
 pygame: y=150
-pygame: rounds=520
+pygame: rounds=2000
 pygame: ideas=400
 pygame: framerate=14
 pygame: export_gif=1
@@ -56,6 +56,7 @@ cluster: run
 # the command to run the build on the cluster and get pygame happening locally
 pygame_cluster: setup_draw_data_folder
 	procs=$(procs) ./cluster-draw.sh
+
 
 # MEASURING ------------------------------------------------------------
 # setup instructions:
