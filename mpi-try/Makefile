@@ -22,7 +22,8 @@ debug: rounds=150
 debug: ideas=20
 debug: run
 
-# pygame: CFLAGS += -DDRAW
+# for gif export: dependency: "imagemagick"
+pygame: CFLAGS += -DDRAW
 pygame: CFLAGS += -DFAIRMOVEMENT
 pygame: CFLAGS += -DFAIRCHECKING
 pygame: setup_draw_data_folder
