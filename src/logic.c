@@ -7,6 +7,8 @@
 // b idea complex
 // c idea worldview
 // h human worldview
+// check if cmplx-difference and WV-differences greater than boundarys 
+// if boundarys are violated, no competition allowed (look at competition-section in _move_ideas(...))
 // slowed with chance, the higher the complxdifferenz, the harder to get
 int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
@@ -22,15 +24,24 @@ int can_compete(Idea i1, Idea i2) {
 } 
 
 // winner check with
-// a idea quali
+// a idea quali + random environment value, representating other influences
+// chance is to eleminate non equal distribution through > and >=
 int wins_over(Idea i1, Idea i2) {
   int i1quali = i1.a + rand_int(2 * ENV_INF_RANGE + 1, - ENV_INF_RANGE);
   int i2quali = i2.a + rand_int(2 * ENV_INF_RANGE + 1, - ENV_INF_RANGE);
-  int first_wins = i1quali >= i2quali;
+  int chance = rand_int(2, 0);
+  int first_wins = 0;
+  if(chance){ 
+    first_wins = i1quali >= i2quali;
+  } else {
+    first_wins = i1quali > i2quali;
+  }
   return first_wins;
 }
 
-//construction of new idea of loosing idea
+// construction of new adapted idea from loosing idea
+// copied winners attribute and adjusts WV in direction of the winner one
+// range of adjustment is adjustable :P
 Idea construct_looser_idea(Idea winner, Idea loser) {
   Idea tempIdea;
   tempIdea.a = winner.a;
@@ -51,7 +62,12 @@ Idea construct_looser_idea(Idea winner, Idea loser) {
 }
 
 
-// Idea-Movement, 1 rank
+// Idea-Movement
+// 2 Flags usable through makefile: 
+// FAIRCHECKING for fair neighbor-search (every neighbor is looked at and 1 of them is randomly taken) 
+// if disabled: first one found wins
+// FAIRMOVEMENT: for fair distribution of movement-targets
+// if disabled: if sorounded chances fo standing still improves with degree of sorounding
 void _move_ideas(Idea** field, Idea** field_new, int start_row, 
                 int num_rows, int num_cols, int rank) {
 
@@ -62,7 +78,8 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
 
       Idea idea = field[y][x]; 
 
-      // if cell is inhabited, first neighbor & competion, then moving
+      // if cell is inhabited, first mutation-evaluation, then neighbor-search & competion, then moving.
+      // else ignore it and take next cell
       if (!idea.empty) {
         // used vars & flags
         int new_x = 0; 
@@ -70,7 +87,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
         int having_neighbors = 0;
 
         // ----------mutation---------
-        // quali & cmplxty
+        // quali & cmplxty mutation with adjustable boundarys & chances
         if(rand_int(100000, 0) < QC_MUT_CHANCE) {
           int direction = rand_int(4, -2);
           if(direction <= 0) direction = -1;
@@ -93,7 +110,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           } 
           else idea.b = 0;
         }
-        // worldviews
+        // worldviews mutation with adjustable boundarys & chances
         if(rand_int(100000, 0) < WV_MUT_CHANCE) {
           int direction = rand_int(3, -1);
           // worldview idea
@@ -125,24 +142,8 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
         } 
 
         // ----------check for neighbors----------
-        // unfair checking, first found, first serve
-        #ifndef FAIRCHECKING
-        for (int move_x = -1; move_x < 2; move_x++) {
-          if (having_neighbors) break;
-          new_x = x + move_x;
-          new_x = new_x == num_cols ? 0 : new_x == -1 ? num_cols-1 : new_x;
-          for (int move_y = -1; move_y < 2; move_y++) {
-            if (! (move_x || move_y)) continue;
-            new_y = y + move_y;
-            if (!(field_new[new_y][new_x].empty)) {
-              having_neighbors = 1;
-              break;
-            }
-          }
-        }
-        #endif
 
-        // fair & complete checking
+        // fair & complete checking with a coordinate set of found neighbors
         #ifdef FAIRCHECKING
         int neighbor_coord_set[16];
         int neighbor_coord_set_count = 0;
@@ -160,11 +161,27 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
             }
           }
         }
-        #endif 
+        // unfair checking, first found, first serve
+        #else
+        for (int move_x = -1; move_x < 2; move_x++) {
+          if (having_neighbors) break;
+          new_x = x + move_x;
+          new_x = new_x == num_cols ? 0 : new_x == -1 ? num_cols-1 : new_x;
+          for (int move_y = -1; move_y < 2; move_y++) {
+            if (! (move_x || move_y)) continue;
+            new_y = y + move_y;
+            if (!(field_new[new_y][new_x].empty)) {
+              having_neighbors = 1;
+              break;
+            }
+          }
+        }
+        #endif
 
         // ----------competition evaluation----------
-        // if cell has neighbor(s) 
-        if (having_neighbors) {
+        // while cell has neighbor(s) & nothing is communicated try as long as find one or there are no more neighbors 
+        int communication_count = neighbor_coord_set_count / 2;
+        while(having_neighbors && communication_count > 0) {
           // fair checking coord-search
           #ifdef FAIRCHECKING
             int competition_target = 2 * rand_int(neighbor_coord_set_count / 2, 0);
@@ -180,7 +197,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           write_idea(neighbor_idea); write(" at %dx, %dy -> ", new_x, new_y);
           
           // competition evaluation
-          // TODO if cant compete && neighbors are there => try again
+
           if(can_compete(idea, neighbor_idea)) { 
             if (wins_over(neighbor_idea, idea)) {
               write_idea(neighbor_idea); write("wins.\n");
@@ -194,13 +211,18 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
               field_new[new_y][new_x] = tempIdea;
               field[new_y][new_x] = idea_dupl(tempIdea);
             }
+            communication_count = 0;
           }
-          else write("can't compete.\n");
+          else { 
+            write("can't compete.\n");
+            communication_count--;
+          }
         }
         write("\n");
 
         // ----------movement----------
         // fair movement
+        // finds a set of possible targets and chooses one based on random
         #ifdef FAIRMOVEMENT
         int target_set[16];
         int target_set_count = 0;
@@ -230,10 +252,9 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           write_idea(idea);
           write("did not move\n");
         }
-        #endif
 
         // no fair movement (higher chance of standing still while sorounded)
-        #ifndef FAIRMOVEMENT
+        #else
         int try_movement = 1;
         int movement_count = 0;
         // find an empty field and move there

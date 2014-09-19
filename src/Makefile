@@ -30,10 +30,10 @@ pygame: setup_draw_data_folder
 pygame: procs=4
 pygame: x=100
 pygame: y=100
-pygame: rounds=200
-pygame: ideas=500
+pygame: rounds=4000
+pygame: ideas=1000
 pygame: framerate=25
-pygame: export_gif=1
+pygame: export_gif=0
 pygame: outfile=out.gif
 pygame: build_executable
 pygame: run

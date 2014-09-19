@@ -1,5 +1,5 @@
 // ------for all------
-// the maximum value for an idea's attributes
+// the maximum value + 1 for an idea's attributes BETTER DO NOT TWEAK if you want to run make pygame (not enough colors => crash)
 #define IDEA_MAX 10
 
 // ------for logic.c------
@@ -43,7 +43,7 @@
 #define MED_IDEA_CHANCE 100
 
 // spawn quality-cmplxty dependency range
-#define QUAL_CMPLTY_DEP_RANGE 1 
+#define QUAL_CMPLXTY_DEP_RANGE 1 
 
 // spawn WV-differenc range
 #define WV_DIFF_RANGE 2

@@ -3,6 +3,7 @@
 
 #include "constants.h"
 
+// idea contains:
 // a idea quali
 // b idea complex
 // c idea worldview
@@ -11,9 +12,13 @@ typedef struct {
   int a, b, c, h, empty;
 } Idea;
 
+// -----idea creation-----
+// possible values depend on IDEA_MAX constant
 Idea idea_new()
 {
   Idea i;
+  // -----quality evaluation-----
+  // 3 classes of possible ideas, chances adjustable
   int chance = rand_int(1000, 0);
   if(chance < BEST_IDEA_CHANCE){
     i.a = rand_int(IDEA_MAX, 0);
@@ -25,8 +30,9 @@ Idea idea_new()
     i.a = rand_int((int) (IDEA_MAX * 0.33), 0);
   }
 
-  // complex should depend on qual
-  int tempb = i.a + rand_int(2 * QUAL_CMPLTY_DEP_RANGE + 1, - QUAL_CMPLTY_DEP_RANGE);
+  // -----complexity evaluation-----
+  // complexity depends on qual
+  int tempb = i.a + rand_int(2 * QUAL_CMPLXTY_DEP_RANGE + 1, - QUAL_CMPLXTY_DEP_RANGE);
   if (0 <= tempb) {
     if (tempb < IDEA_MAX) {
       i.b = tempb;
@@ -35,8 +41,12 @@ Idea idea_new()
   } 
   else i.b = 0;
 
-  // first human worldview based on its init idea worldview
-  i.c = rand_int(IDEA_MAX, 0);  
+  // -----idea world view evaluation-----
+  // worldview arbitrary chosen
+  i.c = rand_int(IDEA_MAX, 0);
+
+  // -----human world view evaluation-----
+  // init human worldview based on its init idea worldview
   int temph = i.c + rand_int(2 * WV_DIFF_RANGE + 1, - WV_DIFF_RANGE);
   if (0 <= temph) {
     if (temph < IDEA_MAX) {
@@ -50,6 +60,7 @@ Idea idea_new()
   return i;
 }
 
+// -----build empty idea with empty-flag set-----
 Idea idea_empty() {
   Idea i;
   i.a = 0;
@@ -60,6 +71,7 @@ Idea idea_empty() {
   return i;
 }
 
+// -----duplicate idea-----
 Idea idea_dupl(Idea i2) {
   Idea i;
   i.a = i2.a;
@@ -67,9 +79,7 @@ Idea idea_dupl(Idea i2) {
   i.c = i2.c;
   i.h = i2.h;
   i.empty = i2.empty;
-
   return i;
 }
-
 
 #endif
