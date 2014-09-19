@@ -2,8 +2,11 @@ import pygal
 import csv
 import sys
 import os
-# cells = sys.argv[1]
+fname = sys.argv[1]
+scale_relative = int(os.getenv("relative_scale",0))
+scale_absolute = int(os.getenv("absolute_scale",0))
 
+print("\n Taking all *.csv-files in maesurements/ for visualization.\n")
 def read_file(path):
     with open(path) as f:
         return list(csv.reader(f, delimiter=':'))
@@ -22,8 +25,9 @@ for label, values in csvs.items():
     chart.x_labels = x_labels
 
     y_values = [float(col[1]) for col in values]
-    # chart.add(label + " absolute" , y_values)
-    y_values = [(float(values[0][1])*int(values[0][0]))/(float(col[1])*int(col[0]))for col in values]
-    chart.add(label + " relative" , y_values)
-
-chart.render_to_file('measurements/chart.svg')
+    if scale_absolute: chart.add(label + " absolute" , y_values)
+    if scale_relative:
+        y_values = [(float(values[0][1])*int(values[0][0]))/(float(col[1])*int(col[0]))for col in values]
+        chart.add(label + " relative" , y_values)
+print("\nOutput to {}.\n".format(fname))
+chart.render_to_file(fname)

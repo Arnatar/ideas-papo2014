@@ -282,12 +282,20 @@ for(int x=0; x<size; x++) {              \
   diff=end_dtime-start_dtime;                                           \
   master(pr("%s: %f", description, diff));
 
+#ifdef MEASURE
+#define toc()                                                           \
+  gettimeofday(&end_time,NULL);                                         \
+  end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
+  diff=end_dtime-start_dtime;                                           \
+  master(printf("%f\n", diff));
 
+#else
 #define toc()                                                           \
   gettimeofday(&end_time,NULL);                                         \
   end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
   diff=end_dtime-start_dtime;                                           \
   master(printf("\nIt took %f seconds.\n\n", diff));
+#endif
 // temp
 #define prf(field) \
   for_every(i, num_rows, { \
