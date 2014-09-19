@@ -15,10 +15,10 @@ Idea idea_new()
 {
   Idea i;
   int chance = rand_int(1000, 0);
-  if(chance < 50){
+  if(chance < BEST_IDEA_CHANCE){
     i.a = rand_int(IDEA_MAX, 0);
   }
-  else if(chance < 100) {
+  else if(chance < MED_IDEA_CHANCE) {
     i.a = rand_int((int) (IDEA_MAX * 0.66), 0);
   }
   else {
@@ -26,7 +26,7 @@ Idea idea_new()
   }
 
   // complex should depend on qual
-  int tempb = i.a + rand_int(3, -1);
+  int tempb = i.a + rand_int(2 * QUAL_CMPLTY_DEP_RANGE + 1, - QUAL_CMPLTY_DEP_RANGE);
   if (0 <= tempb) {
     if (tempb < IDEA_MAX) {
       i.b = tempb;
@@ -37,7 +37,7 @@ Idea idea_new()
 
   // first human worldview based on its init idea worldview
   i.c = rand_int(IDEA_MAX, 0);  
-  int temph = i.c + rand_int(5, -2);
+  int temph = i.c + rand_int(2 * WV_DIFF_RANGE + 1, - WV_DIFF_RANGE);
   if (0 <= temph) {
     if (temph < IDEA_MAX) {
       i.h = temph;

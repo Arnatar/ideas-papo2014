@@ -12,20 +12,20 @@ int can_compete(Idea i1, Idea i2) {
   int convinceable = 1;
   int complxdif = abs(i1.b - i2.b);
   int chance = (complxdif + 1) * rand_int(10000, 0);
-  if(abs((i1.c - i2.h)) > 4 || abs((i2.c - i1.h)) > 4) {
+  if(abs((i1.c - i2.h)) > MAX_CWV_VS_HWV || abs((i2.c - i1.h)) > MAX_CWV_VS_HWV) {
     convinceable = 0;
-  } else if(complxdif > 4) {
+  } else if(complxdif > MAX_CMPLX_DIFF) {
     convinceable = 0;
   }
-  if(chance > 2000) convinceable = 0;
+  if(chance > CONVERSATION_BARRIER) convinceable = 0;
   return convinceable;
 } 
 
 // winner check with
 // a idea quali
 int wins_over(Idea i1, Idea i2) {
-  int i1quali = i1.a + rand_int(15, -8);
-  int i2quali = i2.a + rand_int(15, -8);
+  int i1quali = i1.a + rand_int(2 * ENV_INF_RANGE + 1, - ENV_INF_RANGE);
+  int i2quali = i2.a + rand_int(2 * ENV_INF_RANGE + 1, - ENV_INF_RANGE);
   int first_wins = i1quali >= i2quali;
   return first_wins;
 }
@@ -38,10 +38,10 @@ Idea construct_looser_idea(Idea winner, Idea loser) {
   tempIdea.c = winner.c;
   int adjust = tempIdea.c - loser.h;
   if (adjust > 0) {
-    adjust = loser.h + adjust / 2 + 1 + rand_int(3, -1);
+    adjust = loser.h + adjust / 2 + 1 + rand_int(2 * CL_ADJ_RANGE + 1, - CL_ADJ_RANGE);
   } else if (adjust < 0) {
-    adjust = loser.h + adjust / 2 - 1 + rand_int(3, -1);
-  } else adjust = rand_int(3, -1);
+    adjust = loser.h + adjust / 2 - 1 + rand_int(2 * CL_ADJ_RANGE + 1, - CL_ADJ_RANGE);
+  } else adjust = rand_int(2 * CL_ADJ_RANGE + 1, - CL_ADJ_RANGE);
   if (adjust >= 0) {
     if (adjust < IDEA_MAX) {
       tempIdea.h = adjust;
@@ -71,11 +71,11 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
 
         // ----------mutation---------
         // quali & cmplxty
-        if(rand_int(100000, 0) < 50) {
+        if(rand_int(100000, 0) < QC_MUT_CHANCE) {
           int direction = rand_int(4, -2);
           if(direction <= 0) direction = -1;
           // quali
-          int adjust = idea.a + direction * rand_int(3, 1);
+          int adjust = idea.a + direction * rand_int(2 * QC_MUT_RANGE + 1, - QC_MUT_RANGE); 
           if (0 <= adjust) {
             if (adjust < IDEA_MAX) {
               idea.a = adjust;
@@ -84,7 +84,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           } 
           else idea.a = 0;
           // complxty
-          adjust = idea.b + direction * rand_int(3, 1);
+          adjust = idea.b + direction * rand_int(2 * QC_MUT_RANGE + 1, - QC_MUT_RANGE);
           if (0 <= adjust) {
             if (adjust < IDEA_MAX) {
               idea.b = adjust;
@@ -94,10 +94,10 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           else idea.b = 0;
         }
         // worldviews
-        if(rand_int(100000, 0) < 10) {
+        if(rand_int(100000, 0) < WV_MUT_CHANCE) {
           int direction = rand_int(3, -1);
           // worldview idea
-          int adjust = idea.c + direction * rand_int(2, 1);
+          int adjust = idea.c + direction * rand_int(2 * WV_MUT_RANGE + 1, - WV_MUT_RANGE);
           int tempc = 0;
           if (0 <= adjust) {
             if (adjust < IDEA_MAX) {
@@ -108,7 +108,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           else tempc = 0;
 
           //worldview human
-          adjust = idea.h + direction * rand_int(2, 1);
+          adjust = idea.h + direction * rand_int(2 * WV_MUT_RANGE + 1, - WV_MUT_RANGE);
           int temph = 0;
           if (0 <= adjust) {
             if (adjust < IDEA_MAX) {
@@ -118,7 +118,7 @@ void _move_ideas(Idea** field, Idea** field_new, int start_row,
           } 
           else temph = 0;
 
-          if(abs(tempc - temph) < 4) {
+          if(abs(tempc - temph) <= WV_MUT_MAX_DIFF) {
             idea.c = tempc;
             idea.h = temph;
           }
