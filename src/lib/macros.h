@@ -12,21 +12,7 @@
   action \
   fclose(fp);
 
-
 #define write_newline(...) fprintf(fp, "\n")
-
-// print array of ints
-#define pra(arr)                     \
-    printf("[ ");                    \
-    foreach(int *v, arr) {           \
-      printf("%d ", *v);             \
-      }                              \
-    printf("]\n");                  \
-  
-#define length(array) (sizeof(array)/sizeof(*(array)))
-#define copy(a,b) memcpy(b,a,sizeof(b))
-
-
 
 #define fill_matrix_with(arr, rows, cols, fill) \
   for(int y=0; y<rows; y++) {       \
@@ -34,12 +20,6 @@
       arr[y][x] = fill;             \
     }                               \
   }                                 \
-
-#define fill_array_with(arr, size, fill) \
-for(int x=0; x<size; x++) {              \
-    arr[x] = fill;                       \
-  }                                      \
-
 
 #define malloc_idea_matrix(name)                            \
   Idea **name = (Idea **)malloc(num_rows * sizeof(Idea *)); \
@@ -67,24 +47,11 @@ for(int x=0; x<size; x++) {              \
     MPI_Type_create_struct(5, blocklengths, offsets, types, &mpi_idea_type); \
     MPI_Type_commit(&mpi_idea_type);                                         \
 
-#define send(idea, to, req) \
-  MPI_Isend(&idea, 1, mpi_idea_type, to, to, MPI_COMM_WORLD, &req) 
-
 #define send_ideas(ideas_arr, to, tag, req) \
   MPI_Isend(ideas_arr, num_cols, mpi_idea_type, to, tag, MPI_COMM_WORLD, &req) 
 
 #define receive_ideas_into(ideas_arr, from, tag, req) \
   MPI_Irecv(ideas_arr, num_cols, mpi_idea_type, from, tag, MPI_COMM_WORLD, &req) 
-
-#define receive_into(buf, from, req) \
-  MPI_Irecv(&buf, 1, mpi_idea_type, from, rank, MPI_COMM_WORLD, &req) 
-
-#define receive_into_and_wait(buf, from) \
-  receive_into(buf, from, req);                       \
-  wait_for(req)                                       \
-
-#define wait_for(req) \
-    MPI_Wait(&req, MPI_STATUS_IGNORE)
 
 #define barrier() \
   MPI_Barrier(MPI_COMM_WORLD)
@@ -98,13 +65,8 @@ for(int x=0; x<size; x++) {              \
 
 #define master(f) if (rank == 0) { f; }
 #define worker(f) if (rank != 0) { f; }
-#define even_ranks(f) if (rank % 2 == 0) { f; }
-#define uneven_ranks(f) if (rank % 2 != 0) { f; }
 
-
-// // OUTPUT
-// #define pr_idea(idea)                             \
-//    printf("(Qual: %d, Complx: %d, IWV: %d, HWV: %d) ",idea.a, idea.b, idea.c, idea.h) \
+// OUTPUT
 
 #define pr_idea(idea)                             \
    printf("(%d %d %d %d)\n ",idea.a, idea.b, idea.c, idea.h) \
@@ -112,7 +74,6 @@ for(int x=0; x<size; x++) {              \
 #ifdef DEBUG
 
 #define write(...) fprintf(fp, __VA_ARGS__)
-#define write_doubles(...) fprintf(fp_doubles, __VA_ARGS__)
 
 #define write_idea(idea)                             \
   write("(%d,%d,%d,%d) ",idea.a, idea.b, idea.c, idea.h) \
@@ -157,7 +118,6 @@ for(int x=0; x<size; x++) {              \
       pre();                  \
     });                       \
   );                          
-
 
 
 #define open_logfile_for_writing() \
@@ -231,38 +191,8 @@ for(int x=0; x<size; x++) {              \
   receive_ideas_into(field[1], prev_rank, GHOST, req4);                 \
 
 
-// void _move_ideas(Idea** field, Idea** field_new, int start_row, 
-//                 int num_rows, int num_cols, int rank) {
-
-// num_rows is not inclusive. e.g.: 0,3 would iterate over 1 and 2 in move_ideas,
-// because the for loop starts with start_row+1 and the stop condition is '< num_rows'
-// TODO: optimize: not the whole field has to be copied (?)
 #define move_ideas(start_row, num_rows) \
   _move_ideas(field, field_new, start_row, num_rows, num_cols, rank); \
-
-#define move_ideas_down(start_row, num_rows) \
-  _move_ideas_down(field, field_new, start_row, num_rows, num_cols, rank); \
-
-
-#define move_top_rows() \
-  move_ideas(0, 3); \
-  copy_field_new_into_field();
-  // copy_partial_field_into_field_new(0, 4);
-
-#define move_bottom_rows() \
-  move_ideas(num_rows - 4, 3);  \
-  copy_field_new_into_field();
-  // copy_partial_field_into_field_new(num_rows-4, 4);
-
-#define send_rows()               \
-  send_real_rows_to_ghost_rows(); \
-  send_ghost_rows_to_real_rows();
-
-#define receive_rows()                 \
-  receive_real_rows_into_ghost_rows(); \
-  receive_ghost_rows_into_real_rows();
-
-
 
 // measure ---------------------------------------------------------------------
 #define init_time_measurement_variables() \
@@ -273,14 +203,6 @@ for(int x=0; x<size; x++) {              \
 #define tic()                                                                 \
   gettimeofday(&start_time,NULL);                                             \
   start_dtime=(double)start_time.tv_sec+(double)start_time.tv_usec/1000000.0; \
-
-
-
-#define tocs(description)                                                           \
-  gettimeofday(&end_time,NULL);                                         \
-  end_dtime=(double)end_time.tv_sec+(double)end_time.tv_usec/1000000.0; \
-  diff=end_dtime-start_dtime;                                           \
-  master(pr("%s: %f", description, diff));
 
 #ifdef MEASURE
 #define toc()                                                           \
@@ -297,16 +219,8 @@ for(int x=0; x<size; x++) {              \
   master(printf("\nIt took %f seconds.\n\n", diff));
 
 #endif
-// temp
-#define prf(field) \
-  for_every(i, num_rows, { \
-      for_every(j, num_cols, { \
-          pr_idea(field[i][j]); \
-      }); \
-      pre(); \
-  }); \
-      pre(); \
 
+// ------------------- the rest ----------
 
 #define copy_field_into_field_new()    \
   for_every(i, num_rows, {             \
@@ -322,14 +236,6 @@ for(int x=0; x<size; x++) {              \
       });                              \
   }); 
 
-#define copy_partial_field_into_field_new(start_row, num_rows)    \
-  for(int i=start_row; i<start_row+num_rows; i++) { \
-    for(int j=0; j<num_cols; j++) { \
-        field_new[i][j] = field[i][j]; \
-      }                              \
-  } 
-
-
 // DRAWING ---------------------------------------------------------------------
 #ifdef DRAW
 
@@ -338,7 +244,6 @@ for(int x=0; x<size; x++) {              \
 #define write_idea_draw(idea)                             \
   write_draw("%d %d %d %d, ",idea.a, idea.b, idea.c, idea.h) \
 
-// print array of ideas
 #define save_local_field_for_drawing() \
     for(int j=1; j<num_rows-1;j++) {  \
       for(int k=0; k<num_cols; k++) {  \
