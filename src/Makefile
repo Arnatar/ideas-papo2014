@@ -4,7 +4,6 @@ f=main.c lib/helpers.c logic.c idea.c
 include_paths=-Ilib/ -Iheaders/lib/ -Iheaders/ -I.
 
 library_paths=-lrt -Llib
-procs=4
 
 CFLAGS=-std=c99 -O3
 
@@ -30,11 +29,11 @@ pygame: setup_draw_data_folder
 pygame: procs=4
 pygame: x=100
 pygame: y=100
-pygame: rounds=4000
-pygame: ideas=1000
+pygame: rounds=1000
+pygame: ideas=1500
 pygame: framerate=25
-pygame: export_gif=0
-pygame: outfile=out.gif
+pygame: export_gif=1
+pygame: outfile=smaller.gif
 pygame: build_executable
 pygame: run
 pygame: run_draw
@@ -59,17 +58,6 @@ pygame_cluster: setup_draw_data_folder
 
 
 # MEASURING ------------------------------------------------------------
-# setup instructions:
-# 1. add the following to ~/.ssh/config :
-# Host cluster
-    # HostName cluster.wr.informatik.uni-hamburg.de
-    # User <your-cluster-user-name>
-# 2. Add your SSH-key to the cluster
-# 2.1 if you don't have a ssh key:
-#   ssh-keygen -t rsa -C "<your-email>"
-# 2.2 ssh-copy-id cluster
-# 3. set the right username ~10 lines down (cluster_username), and the other options optionally
-# 4. Set a python_bin that has pygal installed
 
 # is called by the measure script
 cluster_build_measure: setup_draw_data_folder
