@@ -16,7 +16,8 @@ This whole simulation can be visualized, where people are points on a quadratic 
 
 ### setup for running on cluster
 To run/measure on cluster: 
-1. Add the following to your ~/.ssh/config :
+
+1. Add the following to your `~/.ssh/config`:
   1. Host cluster
     HostName cluster.wr.informatik.uni-hamburg.de
     User <your-cluster-user-name>
