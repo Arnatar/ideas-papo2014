@@ -19,8 +19,8 @@ To run/measure on cluster:
 
 1. Add the following to your `~/.ssh/config`:
   1. Host cluster
-      HostName cluster.wr.informatik.uni-hamburg.de
-      User <your-cluster-user-name>
+      `HostName cluster.wr.informatik.uni-hamburg.de`
+      `User <your-cluster-user-name>`
 2. Add your SSH-key to the cluster
   1. If you don't have a ssh key: `ssh-keygen -t rsa -C "<your-email>"`
   2. `ssh-copy-id cluster`
