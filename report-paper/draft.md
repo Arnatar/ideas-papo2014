@@ -123,15 +123,15 @@ Das Problem von Realtime-Visualisierung scheint uns aber kein triviales zu sein:
 
 Wie zu erwarten, ist die Performance mit aktiviertem IO ca. um den Faktor 80 schlechter als ohne:
 
-![](/pics/io-vs-no-io absolute.jpg)
+![](pics/io-vs-no-io absolute.jpg)
 
 Hingegen ist der Speedup aehnlich (ein Wert von 1 hieße eine lineare Relation zwischen Anzahl von Prozessen und absoluter Geschwindigkeit, weniger entsprechend weniger effektiv):
 
-![](/pics/io-vs-no-io rel.jpg)
+![](pics/io-vs-no-io rel.jpg)
 
 Der absolute Verlauf ohne IO sieht wie folgt aus:
 
-![](/pics/perf-abs.jpg)
+![](pics/perf-abs.jpg)
 
 Die Ausschlaege sind in diesem Fall relativ stark, sie treten allerdings immer auf und treten dann auf, wenn ein zusaetzlicher Rechner innerhalb des Clusters dazukommt, da dann ein Mehraufwand an Network-Kommunikation auftritt. 
 
