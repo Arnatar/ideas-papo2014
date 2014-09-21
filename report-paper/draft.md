@@ -146,4 +146,10 @@ Folgende Optimierungen haben wir im Laufe der Entwicklung vorgenommen:
 
 Generell also kann man den Entwicklungsprozess, was den MPI-Part anging, hauptsaechlich als ein Suchen nach Bugs, die den Großteil der Zeit extrem "mysteriöse" Resultate erzeugten, beschreiben. Leider war Debug-Tooling hier nicht wirklich hilfreich, zum einen wegen der involvierten Randomness, die zu nicht reproduzierbaren Ergebnissen führte, zum anderen, weil erste spezifische Konstellationen des Feldes zu korrupierten Ergebnissen führten. 
 
-Dementsprechend kann man unsere Strategie bezüglich MPI, als denn alles so funktionierte, wie es sollte, als sehr defensiv beschreiben; das System erschien uns so fragil, und wir wollten endlich eine funktionierende Basis für die Simulation an sich haben. Daher kann es durchaus sein, dass der MPI-Part noch optimiert werden könnte; wobei unser Kommunikations
+Dementsprechend kann man unsere Strategie bezüglich MPI, als denn alles so funktionierte, wie es sollte, als sehr defensiv beschreiben; das System erschien uns so fragil, und wir wollten endlich eine funktionierende Basis für die Simulation an sich haben. Daher kann es durchaus sein, dass der MPI-Part noch optimiert werden könnte.
+
+Dazu kam, dass die Visualisierung eh am besten aussah mit einem Feld von 200x200 Ideen. Diese Größe konnte man problemlos auch lokal in einigen Sekunden mit MPI generieren. Außerdem war wie schon erwaehnt in der Variante mit auf dem Cluster rechnen, Daten nach local kopieren und dort visualisieren das Bottleneck nicht MPI oder C überhaupt, sondern rsync. 
+
+Wenn man also weiter haette optimieren wollen, dann vermutlich in erster Linie an der Toolchain an sich - eine Visualisierung ohne I/O auf dem Cluster waere hier mit Abstand der gewinnbringendste Approach.
+
+Wir haben den Fokus dann eher auf das Ausbauen der Simulationslogik und der Darstellung dieser gelegt, da wie gesagt der Stand der Dinge hinsichtlich der Engine ausreichend war, um für die Visualisierung geeignete Feldgrößen mit einer ausreichenden Anzahl an Runden hinreichend schnell zu berechnen. 
