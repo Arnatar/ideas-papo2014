@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stdlib.h> durch ein 
 #include <stdio.h>
 #define COLOR    "\x1b[32m"
 #define RESET   "\x1b[0m"
