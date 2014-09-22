@@ -1,6 +1,6 @@
 \title{Simmulation Ideenverbreitung}
 %TODO :
-\subtitle{IDK ATM}
+\subtitle{Praktikumsbericht}
 
 \author{Arne Struck, Manuel Börries, Jonathan Werner}
 
@@ -243,8 +243,8 @@ Leider ist die Praktikabilität hiervon sehr eingeschränkt, da größere Dateim
 Somit wird der Performance-Gewinn durch den Cluster unterminiert.
 Ein weiterer Nachteil ist, dass es sich hierbei um keine Realtime-Visualisierung handelt, sondern nur ein Replay nach der Berechnung abgespielt wird. \\
 \quad \\
-Das Problem eine Realtime-Visualisierung scheint aber kein triviales zu sein: 
-Schließlich müssten die Daten in einem master rank pro Runde gesammelt werden um sie dann grafisch auszugeben. 
+Das Problem einer Realtime-Visualisierung scheint aber kein triviales zu sein, 
+schließlich müssten die Daten in einem master rank jede Runde gesammelt werden um sie dann grafisch auszugeben. 
 Somit wäre hier ein Bottleneck während der Berechnung geschaffen.
 Des weiteren war nicht klar, wie und ob so etwas überhaupt auf dem Cluster - per X-Forwarding - funktionieren würde, weshalb wir uns schlussendlich für die lokale Scripting-Variante entschieden haben.
 \newpage
