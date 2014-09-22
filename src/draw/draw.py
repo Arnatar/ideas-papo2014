@@ -118,6 +118,7 @@ class Draw():
     def init_pygame(self):
         pygame.init()
 	pygame.display.set_caption('Ideas')
+
         self.field_length = AMOUNT*SIZE
         self.screen = pygame.display.set_mode(
                 (self.field_length+x_size_graphs,self.field_length), 0, 32)
