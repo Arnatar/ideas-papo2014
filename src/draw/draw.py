@@ -15,8 +15,19 @@ import os
 from os.path import basename
 import subprocess
 import glob
+from collections import Counter
+
+# stats ------------------------------------------------------------------------
+compare_wv_counts=1
+
+STATS_BRIGHTS="% qual>5"
+STATS_AVG_QUAL="avg qual"
+STATS_AVG_COMPL="avg complex"
+STATS_UNIQUE_WVS="unique wvs"
 
 black = (0, 0, 0)
+white = (255,255,255)
+hirnatian = (166,219,171)
 
 blue="#0074D9"
 teal="#39CCCC"
@@ -56,9 +67,10 @@ rounds=int(os.getenv("rounds",0))
 procs=int(os.getenv("procs",0))
 outfile=os.path.join(out_dir, os.getenv("outfile","out.gif"))
 export=int(os.getenv("export_gif",0))
+num_ideas=int(os.getenv("ideas",0))
 
-if y==0 or x==0 or rounds==0 or procs==0:
-    print("need x,y,rounds and procs env vars")
+if y==0 or x==0 or rounds==0 or procs==0 or num_ideas==0 :
+    print("need x,y,ideas, rounds and procs env vars")
     sys.exit()
 
 # if os.path.isfile(outfile):
@@ -68,6 +80,11 @@ if y==0 or x==0 or rounds==0 or procs==0:
 AMOUNT = y if y >= x else x
 
 y_resolution = 700  
+x_size_graphs = 600
+padding_graph = 30
+
+# unique_ideas = set()
+# all_ideas = []
 
 # size of one piece
 SIZE=int(floor(y_resolution/AMOUNT))
@@ -81,7 +98,7 @@ def read_step_file(fname):
     with open(os.path.join(data_dir, fname)) as f:
         for line in f:
             step_data.append([map(int,nums.strip().split(" ")) 
-                        for nums in line.split(",")[:-1]])
+	                   for nums in line.split(",")[:-1]])
     return step_data
 
 def clean_tmp_images():
@@ -89,6 +106,7 @@ def clean_tmp_images():
 
 # -------------- CLASS -----------------------
 class Draw():
+    
     def __init__(self, files_sorted):
 
         self.files_sorted = files_sorted
@@ -97,73 +115,149 @@ class Draw():
 
     def init_pygame(self):
         pygame.init()
-        pygame.display.set_caption('Ideas')
-        self.screen = pygame.display.set_mode((AMOUNT*SIZE,AMOUNT*SIZE), 0, 32)
+	pygame.display.set_caption('Ideas')
+        self.field_length = AMOUNT*SIZE
+        self.screen = pygame.display.set_mode(
+                (self.field_length+x_size_graphs,self.field_length), 0, 32)
         self.clock = pygame.time.Clock()
         self.completed_rounds = 0
 
-    def color_scale_intensity(self, value):
-        # higher value = darker
-        return 255 - 25*value
+        self.graph_box_length = x_size_graphs-padding_graph*2
+        self.left_bottom_corner_of_graph = \
+            (self.field_length + padding_graph, self.field_length - padding_graph)
+        self.font = pygame.font.SysFont(None, 24)
 
+# colors=map(Color, [blue, teal, yellow, orange, red, maroon, fuchsia, olive, lime, grey])
+        self.legend_items = {
+                    STATS_AVG_QUAL: (olive, self.avg_quality)
+                  , STATS_AVG_COMPL: (orange, self.avg_complexity)
+                  , STATS_BRIGHTS: (yellow , self.amount_brights)
+                  , STATS_UNIQUE_WVS: (blue, self.unique_wvs)
+            }
+
+        self.draw_graph_box_and_legend()
 
     def draw_point(self,x,y, idea):
         quali, complx, wv, human_wv = idea
         color = dim(colors[wv], quali/9)
         draw.rect(self.screen, color, [x, y, SIZE, SIZE])
 
-    def print_step(self, step_data):
-        for y, row in enumerate(step_data):
-            for x, col in enumerate(row):
-                if col != [0,0,0,0]:
-                    self.draw_point(SIZE*x,SIZE*y, col)
+    def print_step(self):
+        for y, row in enumerate(self.step_data):
+            for x, idea in enumerate(row):
+                if idea != [0,0,0,0]:
+                    self.draw_point(SIZE*x,SIZE*y, idea)
+
+    def draw_graph_point(self, legend_item_name, func=None, wv=None):
+        if legend_item_name:
+            color_hex, func = self.legend_items[legend_item_name]
+            color = Color(color_hex)
+            value, max_value = func()
+        else:
+            value, max_value = func(wv)
+            color = colors[wv]
+
+        round_ = self.completed_rounds
+
+        offset_x = int((round_/rounds) * self.graph_box_length)
+        offset_y = int((value/max_value) * self.graph_box_length)
+
+        x = self.left_bottom_corner_of_graph[0] + offset_x
+        y = self.left_bottom_corner_of_graph[1] - offset_y
+        draw.rect(self.screen, color, [x , y, 2, 2])
+
+    def draw_text(self, txt, x,y):
+        x_size,_ = self.font.size(txt)
+        color = (200,200,200)
+        self.screen.blit(self.font.render(txt, True, color), (x, y))
+        return x_size
+
+    def draw_graph_box_and_legend(self):
+        x_end = self.left_bottom_corner_of_graph[0] + self.graph_box_length
+        # y_end = self.left_bottom_corner_of_graph[1] - self.graph_box_length
+        color = (30,30,30)
+        draw.line(self.screen, color, 
+                    self.left_bottom_corner_of_graph,
+                    (self.left_bottom_corner_of_graph[0] + self.graph_box_length,
+                        self.left_bottom_corner_of_graph[1]))
+        draw.line(self.screen, color, 
+                    self.left_bottom_corner_of_graph,
+                    (self.left_bottom_corner_of_graph[0],
+                        self.left_bottom_corner_of_graph[1] - self.graph_box_length))
+        # legend
+        # if not compare_wv_counts:
+        x = self.field_length+padding_graph
+        y = 10
+        rectsize = 15
+        for legend_item_name, (legend_item_color,_) in self.legend_items.items():
+            draw.rect(self.screen, Color(legend_item_color), [x,y, rectsize,rectsize])
+            x += rectsize + 10
+            x_size_text = self.draw_text(legend_item_name, x, y)
+            x += x_size_text + 20
+                    
+
 
     def run(self):
         unique_wvs_last=10
 
         for round_ in range(rounds):
-            # t0 = time.clock()
-
+            self.completed_rounds = round_
             # get data from file ---------------------------------------------------
             fnames_for_round = ["{}-{}".format(round_,i) for i in range(procs)]
             pool = Pool()
-            step_data = chain(*pool.map(read_step_file, fnames_for_round))
+            self.step_data =list(chain(*pool.map(read_step_file, fnames_for_round)))
             pool.close()
             pool.join()
-
-            # print time.clock() - t0
+ 
             # draw on screen -------------------------------------------------------
-            # t0 = time.clock()
-            self.screen.fill(black)
-            self.print_step(step_data)
+            self.screen.fill(black, rect=(0,0,self.field_length,self.field_length))
+            self.print_step()
+
+            if compare_wv_counts:
+                self.draw_graph_point(STATS_AVG_QUAL)
+                self.draw_graph_point(STATS_AVG_COMPL)
+                self.draw_graph_point(STATS_BRIGHTS)
+                self.draw_graph_point(STATS_UNIQUE_WVS)
+            else:
+                for wv in range(10): 
+                    self.draw_graph_point(None, self.wv_count, wv)
 
             pygame.display.flip()
-            # print time.clock() - t0
-            # print ""
 
             self.clock.tick(framerate)
 
-            # unique_wvs = self.unique_wvs(step_data)
-            # if unique_wvs_last and unique_wvs != unique_wvs_last:
-            #     print("round {}: {} unique wv's".format(
-            #         round_,self.unique_wvs(step_data)))
-            # unique_wvs_last = unique_wvs
-
             self.output_image(round_)
 
-            self.completed_rounds = round_
             event = pygame.event.poll()
             if event.type == QUIT or event.type == KEYDOWN and event.key == K_ESCAPE:
                 self.quit()
                 break
 
         if export: self.generate_animation(self.completed_rounds)
-        # print("\nOpening in Chrome...\n")
-        # subprocess.call(["google-chrome-stable", outfile])
         self.quit()
 
-    def unique_wvs(self, step_data):
-        return len(set(idea[2] for idea in chain(*step_data)))
+    def wv_count(self, wv):
+        return (len([idea[2] for idea in chain(*self.step_data) if idea[2]==wv]),
+                num_ideas)
+
+    def unique_wvs(self):
+        return (len(set(idea[2] for idea in chain(*self.step_data))),
+                10)
+
+    def avg_quality(self):
+        return (sum(idea[0] for idea in chain(*self.step_data) 
+                if idea != [0,0,0,0]) / num_ideas, 
+                9)
+
+    def avg_complexity(self):
+        return (sum(idea[1] for idea in chain(*self.step_data) 
+                if idea != [0,0,0,0]) / num_ideas, 
+                9)
+
+    def amount_brights(self):
+        return (sum(1 for idea in chain(*self.step_data) 
+                if idea[0] > 5 ), 
+                num_ideas)
 
     def output_image(self, round_):
         fname=os.path.join(tmp_dir, str(round_) + ".png")

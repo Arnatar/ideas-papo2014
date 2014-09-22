@@ -27,13 +27,13 @@ pygame: CFLAGS += -DFAIRMOVEMENT
 pygame: CFLAGS += -DFAIRCHECKING
 pygame: setup_draw_data_folder
 pygame: procs=4
-pygame: x=100
-pygame: y=100
-pygame: rounds=1000
-pygame: ideas=1500
-pygame: framerate=25
-pygame: export_gif=1
-pygame: outfile=smaller.gif
+pygame: x=200
+pygame: y=200
+pygame: rounds=1500
+pygame: ideas=4000
+pygame: framerate=30
+pygame: export_gif=0
+pygame: outfile=out.gif
 pygame: build_executable
 pygame: run
 pygame: run_draw
@@ -67,7 +67,7 @@ cluster_build_measure: CFLAGS += -DFAIRMOVEMENT
 cluster_build_measure: CFLAGS += -DFAIRCHECKING
 cluster_measure cluster_build_measure: x=2000
 cluster_measure cluster_build_measure: y=4000
-cluster_measure cluster_build_measure: rounds=520
+cluster_measure cluster_build_measure: rounds=220
 cluster_measure cluster_build_measure: ideas=200
 cluster_build_measure: build_executable
 
@@ -114,4 +114,4 @@ run:
 	x=$(x) y=$(y) ideas=$(ideas) rounds=$(rounds) mpirun -np $(procs) ./a.out
 
 run_draw:
-	x=$(x) y=$(y) export_gif=$(export_gif) framerate=$(framerate) rounds=$(rounds) procs=$(procs) outfile=$(outfile) python2 draw/draw.py
+	ideas=$(ideas) x=$(x) y=$(y) export_gif=$(export_gif) framerate=$(framerate) rounds=$(rounds) procs=$(procs) outfile=$(outfile) python2 draw/draw.py
