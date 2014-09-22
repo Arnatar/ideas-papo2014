@@ -27,7 +27,6 @@ STATS_UNIQUE_WVS="unique wvs"
 
 black = (0, 0, 0)
 white = (255,255,255)
-hirnatian = (166,219,171)
 
 blue="#0074D9"
 teal="#39CCCC"
@@ -85,6 +84,9 @@ padding_graph = 30
 
 # unique_ideas = set()
 # all_ideas = []
+
+unique_ideas = set()
+all_ideas = []
 
 # size of one piece
 SIZE=int(floor(y_resolution/AMOUNT))
@@ -196,7 +198,6 @@ class Draw():
             x += x_size_text + 20
                     
 
-
     def run(self):
         unique_wvs_last=10
 
@@ -205,6 +206,7 @@ class Draw():
             # get data from file ---------------------------------------------------
             fnames_for_round = ["{}-{}".format(round_,i) for i in range(procs)]
             pool = Pool()
+
             self.step_data =list(chain(*pool.map(read_step_file, fnames_for_round)))
             pool.close()
             pool.join()
