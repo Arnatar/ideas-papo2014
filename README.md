@@ -34,7 +34,4 @@ Run `make <config>` from `src`-directory, where `<config>` is one of the followi
 - `cluster_measure`: this runs the program on the cluster with a configurable range of processes and graphs the results locally per python + pygal.
 
 You can find all configurable parameters in the Makefile.
-
-
-
-
+You can find some constants in constans.h if you desire to tweak the ideas behaviour yourself.
