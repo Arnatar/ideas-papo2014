@@ -113,11 +113,182 @@ Die möglichen Bewegungen sind hier noch einmal grafisch in rot zu sehen dargest
 
 \section{Implementation}
 \subsection{Logik und Idee \& Mensch}
-Die im Abschnitt Modellierung geschilderten Modellierungen sind eins zu eins in Software umgesetzt, mit der Ausnahme, dass ein Mensch/ eine Idee durch einen struct mit 4 Feldern repräsentiert wird.
+Die im Abschnitt Modellierung geschilderten Modellierungen sind eins zu eins in Software umgesetzt, mit der Ausnahme, dass ein Mensch/ eine Idee durch einen struct mit 4 Feldern repräsentiert wird, wobei noch ein weiteres Feld als Flag für eine empty-idea hinzukommt.
 
-\section{Probleme}
-%TODO content
+\subsection{Parallelisierungsschema}
 
-%TODO bibliography with used mats
-\pagebreak
+Das Feld wird implementiert durch ein 2D-Array über den struct Ideas.
+
+\begin{verbatim}
+#define malloc_idea_matrix(name)                              
+    Idea **name = (Idea **)malloc(num_rows * sizeof(Idea *)); 
+    for (int i = 0; i < num_rows; ++i)                        
+        name[i] = (Idea *)malloc(num_cols * sizeof(Idea)); 
+\end{verbatim}
+\quad \\
+Es werden \textit{zwei} Felder erstellt:
+
+\begin{verbatim}
+malloc_idea_matrix(field)
+malloc_idea_matrix(field_new)
+\end{verbatim}
+\quad \\
+\texttt{field} wird daraufhin mit leeren Ideen initialisiert und an zufälligen Positionen werden Ideen gespawnt. 
+Der Inhalt von \texttt{field} wird dann in \texttt{field\_new} kopiert. 
+Man braucht diese zwei Felder, damit eine Idee nur ein mal pro Runde ziehen kann: 
+es wird über den Inhalt von \texttt{field} iteriert, der Zug Ideen wird in \texttt{field\_new} vermerkt. 
+Somit ist erreicht, dass eine die Idee nach rechts zog, im nächsten Iterationsschritt nicht noch einmal zum Zuge kommen. 
+Das Kopieren der Felder ist wie folgt implementiert:
+
+\begin{verbatim}
+#define copy_field_into_field_new()        
+    for_every(i, num_rows, {               
+        for_every(j, num_cols, {           
+            field_new[i][j] = field[i][j]; 
+          });                              
+    });
+\end{verbatim}
+\quad \\
+Der Versuch dies mittels \texttt{memcpy} effizienter zu gestalten schlug fehl, da \texttt{memcpy} bei 2D-Arrays nur die Pointer der Arrays der zweiten Ebene kopiert werden. 
+Dies ist allerdings nicht im Interesse des Programmes, da die Ideen by value kopiert werden müssen. \\
+\newpage
+\quad \\
+Die Aufteilung des 2D-Arrays auf die MPI-Prozesse funktioniert per horizontaler Spaltung des Feldes.
+Dies bringt die Vorteile einer schnellen Aufteilung und Reduktion der Anzahl an Kanten, welche kommuniziert werden müssen.
+Die Ränder bestehen aus \textit{ghost rows}, wobei eine \textit{ghost row} des aktuellen \textit{ranks} der vorletzten Reihe des benachbarten \textit{ranks} entspricht. Die Kommunikation besteht im Austausch der \textit{real} und der \textit{ghost rows} mit den jeweiligen Nachbarn.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[scale=1]{pics/real-ghost-rows.jpg}
+\end{figure}
+\quad \\
+Dies ermöglicht, jedem Prozess seine Züge unabhängig von den anderen Prozessen durchzuführen. 
+Wenn eine Idee auf einer \textit{real row} nach oben respektive nach unten zieht, so hat sie garantiert die Informationen, welche Werte sich in der Zielzelle aus dem Nachbarprozess befinden. \\
+Aus diesem Vorgehen resultiert das Konzept der \textit{dependent rows} an den Rändern und der \textit{independent rows} in der Mitte. \\
+\textit{Dependend} bedeutet, dass die Ereignisse betreffend Ideen die anliegenden \textit{ranks} betreffen können. 
+Die drei äußersten \textit{rows} an den Rändern sind jeweils \textit{dependent}: 
+Die beiden äußeren müssen direkt mit dem Nachbarn kommunizieren und die Drittäußerste kann durch Interaktion von Ideen mit der zweitäußersten \textit{row} ebenso \textit{dependet} sein.  \\
+Die restlichen \textit{rows} hingegen tangieren die anderen \textit{ranks} nicht innerhalb einer Runde, denn pro Runde kann eine Idee nur ein Feld weiter ziehen. 
+Somit können diese \textit{rows} als \textit{independent} gelten.
+\newpage
+
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.6]{pics/dependent-rows.jpg}
+\end{figure}
+\quad \\
+Daraus folgt, dass die Berechnung der Ereignisse im Feldabschnitt der \textit{independent rows} unabhängig von anderen \textit{ranks} erfolgen kann, die der \textit{dependent rows} allerdings nicht und somit zeitlich orchestriert werden muss.
+Diese Orchestration erfolgt in drei Schritten, diese Schritte sehen wie folgt aus und gelten für jeden \textit{rank}.
+
+\begin{enumerate}
+	\item Bewege die Ideen die sich auf den \textit{independent rows} befinden.
+	\item Bewege die Ideen, die sich auf den \textit{dependent top rows} befinden:
+	\begin{enumerate}
+  		\item[1.] Sende \textit{top real} und \textit{top ghost row} zu oberem Nachbarn.
+  		\item[2.] Empfange \textit{top real} und \textit{top ghost row} von unterem Nachbarn.
+	\end{enumerate}
+	\item Analog wie Schritt 2 für die \textit{bottom dependent rows}.
+\end{enumerate}
+\quad \\
+Die Kommunikation zwischen den \textit{ranks} wird mittels \texttt{MPI\_Isend} und \texttt{Irecv} realisiert. Dies hat den Vorteil, dass real und \textit{ghost row} nacheinander versendet werden, ohne erst auf die Empfangsbestätigung für das erste Paket zu warten. \\ 
+\newpage
+\quad \\
+Im Code sieht das wie folgt aus: \\
+\begin{verbatim}
+#define send_ideas(ideas_arr, to, tag, req) \
+  MPI_Isend(ideas_arr, num_cols, mpi_idea_type, to, tag, MPI_COMM_WORLD, &req) 
+
+#define receive_ideas_into(ideas_arr, from, tag, req) \
+  MPI_Irecv(ideas_arr, num_cols, mpi_idea_type, from, tag, MPI_COMM_WORLD, &req) 
+
+#define send_top_rows(field) \
+  /* send our first ghost row into the bottom real row of the previous rank */ \
+  send_ideas(field[0], prev_rank, GHOST, req);                                 \
+  /* send our first real row into the bottom ghost row of the previous rank */ \
+  send_ideas(field[1], prev_rank, REAL, req2);                                 \
+
+#define receive_into_bottom_rows(field) \
+  /* receive first ghost row from next rank into our bottom real row */ \
+  receive_ideas_into(field[num_rows-2], next_rank, GHOST, req);         \
+  /* receive first real row from next rank into our bottom ghost row */ \
+  receive_ideas_into(field[num_rows-1], next_rank, REAL, req2);         \
+\end{verbatim}
+\quad \\
+Der \texttt{mpi\_idea\_type} wird hierbei auf folgende Art definiert: \\
+\begin{verbatim}
+#define mpi_define_idea_type()                                               \
+  int          blocklengths[5] = {1,1,1,1,1};                                \
+  MPI_Datatype types[5] = {MPI_INT,MPI_INT,MPI_INT, MPI_INT, MPI_INT};       \
+  MPI_Datatype mpi_idea_type;                                                \
+  MPI_Aint     offsets[5];                                                   \
+  offsets[0] = offsetof(Idea, a);                                            \
+  offsets[1] = offsetof(Idea, b);                                            \
+  offsets[2] = offsetof(Idea, c);                                            \
+  offsets[3] = offsetof(Idea, h);                                            \
+  offsets[4] = offsetof(Idea, empty);                                        \
+    MPI_Type_create_struct(5, blocklengths, offsets, types, &mpi_idea_type); \
+    MPI_Type_commit(&mpi_idea_type);                                         \
+\end{verbatim}
+\quad \\
+Die Kommunikation benutzt \texttt{field\_new} zum Austausch der Daten. Am Ende einer Runde wird dieses pro Prozess in \texttt{field} kopiert. \\
+Es ist entscheidend, die einzelnen Schritte per \texttt{MPI\_Barrier} voneinander zu trennen, da ansonsten \textit{race conditions} auftreten können.
+
+\subsection{Visualisierung}
+Die Visualisierung erfolgt lokal in einer mit Pygame-Implementation. 
+Die Daten werden von C, sofern \texttt{\#define DRAW} gilt, pro Prozess pro Runde in \texttt{src/draw/out/\$round-\$proc} exportiert und im Nachhinein von Python eingelesen. 
+Dies hat den entscheidenden Nachteil, dass zum einen der Nutzen des Clusters eingeschränkt ist: 
+um diesen zu nutzen und gleichzeitig eine Visualisierung zu ermöglichen, müssen die Output-Files auf dem Cluster generiert und dann nach local kopiert werden. 
+Dies geschieht per automatisiertem Deploy script, dass den Quellcode auf den cluster rsync, dort das Programm laufen lässt und darauf die Output-Files wieder per rsync zurück kopiert.
+Leider ist die Praktikabilität hiervon sehr eingeschränkt, da größere Dateimengen bewegt werden müssen. 
+Somit wird der Performance-Gewinn durch den Cluster unterminiert.
+Ein weiterer Nachteil ist, dass es sich hierbei um keine Realtime-Visualisierung handelt, sondern nur ein Replay nach der Berechnung abgespielt wird. \\
+\quad \\
+Das Problem eine Realtime-Visualisierung scheint aber kein triviales zu sein: 
+Schließlich müssten die Daten in einem master rank pro Runde gesammelt werden um sie dann grafisch auszugeben. 
+Somit wäre hier ein Bottleneck während der Berechnung geschaffen.
+Des weiteren war nicht klar, wie und ob so etwas überhaupt auf dem Cluster - per X-Forwarding - funktionieren würde, weshalb wir uns schlussendlich für die lokale Scripting-Variante entschieden haben.
+\newpage
+
+\section{Performance}
+Wie zu erwarten, ist die Performance mit aktiviertem IO ca. um den Faktor 80 schlechter als ohne: \\
+\\
+\includegraphics[scale=0.52]{pics/io-vs-no-io-abs.jpg}
+\quad \\ \\
+Der Speedup der beiden Varianten ähnelt sich aber dennoch. 
+Ein Wert von 1 hieße eine lineare Relation zwischen Anzahl von Prozessen und absoluter Geschwindigkeit,
+weniger entsprechend weniger effektiv: \\
+\includegraphics[scale=0.52]{pics/io-vs-no-io-rel.jpg}
+\newpage
+\quad \\
+Der absolute Verlauf ohne IO sieht wie folgt aus: \\ \\
+\includegraphics[scale=0.6]{pics/perf-abs.jpg}
+\quad \\ \\
+Die Ausschläge sind hier relativ stark, sie treten allerdings immer und dann auf, wenn ein zusätzlicher Rechner innerhalb des Clusters hinzugeschaltet wird, da dann ein Overhead an Network-Kommunikation
+hinzukommt. \\
+Die relativen Speedups und die Abnahme der Effizienz ist damit zu erklären, dass das Verhältnis von MPI-Kommunikation zu realer Rechenzeit steigt und insofern der Anteil an ''teuren'' Instruktionen ständig steigt.
+
+\section{Optimierung und andere Probleme}
+Folgende Optimierungen haben wir unter anderem im Laufe der Entwicklung vorgenommen:
+\begin{enumerate}
+\item \texttt{MPI\_Isend/Recv} anstelle von \texttt{Send/Recv} einsetzen. 
+	Dies brachte ca. 10\% Speedup.
+\item Den \texttt{field\_new} -\textgreater{} \texttt{field} Kopiervorgang nur einmal ausführen. 
+	Dies war Bestandteil eines tieferen Problems, welches uns viele Stunden durch Bugs beschäftigt hat, auch wenn es im Nachhinein trivial wirkt, die ersten Wochen hatten wir das \texttt{field} (und nicht \texttt{field\_new} in der MPI-Kommunikation verschickt. 
+	Dies führte zu Korruptionen im Feld, die Ideen vermehrten sich manchmal, bei einer genügend hohen Ideendichte. 
+	Durch die Zufälligkeit der Simulation war es quasi unmöglich zu debuggen.
+	Erst als wir eine Drop-In Unit-test-artige Bewegungsmethode nutzten, welche Ideen immer nur nach unten gehen ließ, konnten wir den Fehler aufspüren. 
+\item Den schon zuvor angesprochenen Versuch, das Kopieren von \texttt{field\_new} in \texttt{field} per \texttt{memcpy} umzusetzen.
+	Auch dies funktionierte leider erstmal aus uns unbekannten Gründen, sodass der Eindruck entstand, die Simulation tue das, was sie tuen solle. 
+	Leider wurden auf diese Art aber nur Pointer auf die einzelnen rows kopiert. Dies führte zu weiteren schwerwiegenden Bugs.
+	\item Genauere und frühzeitige Differenzierung der einzelnen Logik-Fälle und daraus folgende Optimierung der Laufzeit der inneren Schleife.
+\end{enumerate}
+\quad \\
+Generell kann man den Entwicklungsprozess des MPI-Parts anging hauptsächlich als eine Bugsuche, die den Großteil der Zeit extrem in Anspruch war, beschreiben. 
+Leider waren Debug-Tools hier nicht wirklich hilfreich, zum einen wegen der Involvierung des Zufalls, die zu nicht reproduzierbaren Ergebnissen führten und somit deterministische Fehlersuche unterminierte, zum anderen, weil erste spezifische Konstellationen des Feldes zu korrupierten Ergebnissen führten. \\
+\quad \\
+Dementsprechend kann man unsere Strategie bezüglich MPI, als die Funktionsfähigkeit hergestellt war als defensiv beschreiben.
+Das System erschien fragil und wir wollten endlich eine funktionierende Basis für das Testen der Simulation mit mehreren Prozessoren an sich haben. 
+Daher ist eine Optimierung des MPI-Parts mehr als nicht ausgeschlossen.
+
+%\pagebreak
 %\nocite{*}
