@@ -7,6 +7,7 @@ There is also a slight chance of ideas mutating themselves to account for some d
 
 This whole simulation can be visualized, where people are points on a quadratic field, their ideas "world view index" (which ranges from 0 to 9 for the sake of visualization) is displayed as a unique color, and the quality of the idea determines the "brightness" of the point. You can then experiment with different parameters (for example different densities of ideas on the field) and see certain patterns emerge, e.g the formation of clusters of ideas with the same "world view", which stabilize themselves as they get a higher average "quality".
 
+Example visualizations can be found in the [visualizations](/visualizations) folder.
 
 ### dependencies / setup locally
 - `mpich2`
