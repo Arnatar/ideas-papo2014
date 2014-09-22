@@ -19,6 +19,7 @@ from collections import Counter
 
 # stats ------------------------------------------------------------------------
 compare_wv_counts=1
+compare_avg_qual_per_wv=1
 
 STATS_BRIGHTS="% qual>5"
 STATS_AVG_QUAL="avg qual"
@@ -43,7 +44,7 @@ lime="#01FF70"
 
 grey="#AAAAAA"
 
-colors=map(Color, [blue, teal, yellow, orange, red, maroon, fuchsia, olive, lime, grey])
+colors=map(Color, [blue, teal, olive, lime, yellow, orange, red, maroon, fuchsia, grey])
 
 def dim(color, factor):
     return tuple([int(c*factor) for c in color])
@@ -188,15 +189,19 @@ class Draw():
                     (self.left_bottom_corner_of_graph[0],
                         self.left_bottom_corner_of_graph[1] - self.graph_box_length))
         # legend
-        # if not compare_wv_counts:
         x = self.field_length+padding_graph
         y = 10
-        rectsize = 15
-        for legend_item_name, (legend_item_color,_) in self.legend_items.items():
-            draw.rect(self.screen, Color(legend_item_color), [x,y, rectsize,rectsize])
-            x += rectsize + 10
-            x_size_text = self.draw_text(legend_item_name, x, y)
-            x += x_size_text + 20
+        if not compare_wv_counts:
+            rectsize = 15
+            for legend_item_name, (legend_item_color,_) in self.legend_items.items():
+                draw.rect(self.screen, Color(legend_item_color), [x,y, rectsize,rectsize])
+                x += rectsize + 10
+                x_size_text = self.draw_text(legend_item_name, x, y)
+                x += x_size_text + 20
+        elif compare_avg_qual_per_wv==1:
+            self.draw_text("Average quality per WV",x,y)
+        else:
+            self.draw_text("WV distribution",x,y)
                     
 
     def run(self):
@@ -216,7 +221,7 @@ class Draw():
             self.screen.fill(black, rect=(0,0,self.field_length,self.field_length))
             self.print_step()
 
-            if compare_wv_counts:
+            if not compare_wv_counts:
                 self.draw_graph_point(STATS_AVG_QUAL)
                 self.draw_graph_point(STATS_AVG_COMPL)
                 self.draw_graph_point(STATS_BRIGHTS)
@@ -240,8 +245,18 @@ class Draw():
         self.quit()
 
     def wv_count(self, wv):
-        return (len([idea[2] for idea in chain(*self.step_data) if idea[2]==wv]),
-                num_ideas)
+        if not compare_avg_qual_per_wv:
+            return (len([idea[2] for idea in chain(*self.step_data) 
+                if idea[2]==wv and idea != [0,0,0,0]]),
+                    num_ideas)
+        else:
+            wv_filtered = [idea for idea in chain(*self.step_data) 
+                    if idea[2]==wv and idea != [0,0,0,0] ]
+            len_wv_filtered = len(wv_filtered)
+            if len_wv_filtered:
+                return (sum(idea[0] for idea in wv_filtered) / len(wv_filtered), 9)
+            else:
+                return (0,9)
 
     def unique_wvs(self):
         return (len(set(idea[2] for idea in chain(*self.step_data))),
@@ -263,15 +278,13 @@ class Draw():
                 num_ideas)
 
     def output_image(self, round_):
-        fname=os.path.join(tmp_dir, str(round_) + ".png")
+        fname=os.path.join(tmp_dir, "%05d" % round_ + ".png")
         pygame.image.save(self.screen, fname)
 
     def generate_animation(self, round_=rounds):
         print("\nGenerating animation into {}...\n\n".format(outfile))
-        frame_delay = str(int(100/framerate))
         filename_list = ["{}.png".format(i) for i in range(round_)]
-        command_list = ['convert', '-delay', frame_delay, '-loop', '0'] + \
-                       filename_list + [outfile]
+        command_list = ['ffmpeg', '-r', str(framerate), '-i', '%05d.png', outfile]
         subprocess.call(command_list, cwd=tmp_dir)
 
     def quit(self):
