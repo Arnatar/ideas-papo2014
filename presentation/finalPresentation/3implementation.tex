@@ -45,12 +45,12 @@
 		\item[1.] Bewegen der Ideen (random)
 		\item[2.] Überprüfen ob Ideen miteinander in Wettkampf können 
 	\end{itemize}
-		\begin{lstlisting}[language=C,basicstyle=\small,keywordstyle=\color{black}]
-		int convinceable = 1;
-		if(abs((i1.c - i2.h)) > MAX_CWV_VS_HWV || abs((i2.c - i1.h)) > MAX_CWV_VS_HWV) {
-	    	convinceable = 0;
-	  	} else if(complxdif > MAX_CMPLX_DIFF) {
-	    	convinceable = 0;
+		\begin{lstlisting}[language=C,basicstyle=\small,breaklines=true,keywordstyle=\color{black}]
+		    int convinceable = 1;
+		    if(abs((i1.c - i2.h)) > MAX_CWV_VS_HWV || abs((i2.c - i1.h)) > MAX_CWV_VS_HWV) {
+	    	    convinceable = 0;
+	  	    } else if(complxdif > MAX_CMPLX_DIFF) {
+	    	    convinceable = 0;
 		\end{lstlisting}	
 	\begin{itemize}
 		\item[3.] Bestimmung der Winner-Idea 
@@ -81,7 +81,7 @@
 
 \begin{frame}{Parallelisierungsschema}
 	\begin{picture}(0,0)
-		\put(30,-80){\includegraphics[scale=0.2]{finalPresentation/pics/real-ghost-rows.jpg}}
+		\put(30,-80){\includegraphics[scale=0.9]{finalPresentation/pics/real-ghost-rows.jpg}}
 	\end{picture}
 \end{frame}
 
@@ -89,7 +89,7 @@
 	\begin{itemize}
 		\item horizontales Kommunikationsmuster
 		\item am oberen bzw. unteren Rand ghost row
-		\item Ziehen unabhängig von anderen Prozessen moeglich
+		\item Ziehen unabhängig von anderen Prozessen möglich
 	\end{itemize}
 \end{frame}
 
