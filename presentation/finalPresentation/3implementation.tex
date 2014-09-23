@@ -1,96 +1,66 @@
 \section{Implementation}
 
-\begin{frame}{Was ist eine Idee?}
-	\begin{block}{Eigenschaften einer Idee}
-		\begin{itemize}
-			\item Qualität
-			\item Komplexität
-			\item "Weltanschauungswert"
-			\item Komplexität abhängig von Qualität
-		\end{itemize}
-	\end{block}
-\end{frame}
-
-\begin{frame}[fragile]{Qualität}
+\begin{frame}[fragile]{Implementation Idee}
 	\begin{lstlisting}[language=C,basicstyle=\small,breaklines=true,keywordstyle=\color{black}]
-	 int chance = rand_int(1000, 0);
-	  if(chance < BEST_IDEA_CHANCE){
-	    i.a = rand_int(IDEA_MAX, 0);
-	  }
-	  else if(chance < MED_IDEA_CHANCE) {
-	    i.a = rand_int((int) (IDEA_MAX * 0.66), 0);
-	  }
-	  else {
-	    i.a = rand_int((int) (IDEA_MAX * 0.33), 0);
-	  }
+typedef struct {
+  int quali, complexity, wordview, human_wordview, empty;
+} Idea;
 	  \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Komplexität}
+\begin{frame}[fragile]{Implementation Feld}
 	\begin{lstlisting}[language=C,basicstyle=\small,breaklines=true,keywordstyle=\color{black}]
-	int tempb = i.a + rand_int(2 * QUAL_CMPLXTY_DEP_RANGE + 1, 
-	    -QUAL_CMPLXTY_DEP_RANGE);
-	  if (0 <= tempb) {
-	    if (tempb < IDEA_MAX) {
-	      i.b = tempb;
-	    } 
-	    else i.b = IDEA_MAX - 1;
-	  } 
-	  else i.b = 0;
-	\end{lstlisting}
-\end{frame}
+#define malloc_idea_matrix(name) \
+  Idea **name = 
+    (Idea **)malloc(num_rows * sizeof(Idea *)); \
+  for (int i = 0; i < num_rows; ++i) \
+      name[i] = 
+        (Idea *)malloc(num_cols * sizeof(Idea));\
 
-\begin{frame}[fragile]{Kommunikation \& Gewinner Berechnung}
-	\begin{itemize}
-		\item[1.] Bewegen der Ideen (random)
-		\item[2.] Überprüfen ob Ideen miteinander in Wettkampf können 
-	\end{itemize}
-		\begin{lstlisting}[language=C,basicstyle=\small,breaklines=true,keywordstyle=\color{black}]
-		    int convinceable = 1;
-		    if(abs((i1.c - i2.h)) > MAX_CWV_VS_HWV || abs((i2.c - i1.h)) > MAX_CWV_VS_HWV) {
-	    	    convinceable = 0;
-	  	    } else if(complxdif > MAX_CMPLX_DIFF) {
-	    	    convinceable = 0;
-		\end{lstlisting}	
-	\begin{itemize}
-		\item[3.] Bestimmung der Winner-Idea 
-		\item[4.] Überschreiben der Loser-Idea
-	\end{itemize}
+...
+
+malloc_idea_matrix(field)
+malloc_idea_matrix(field_new)
+\end{lstlisting}
 \end{frame}
 
 
-\begin{frame}[fragile]{Parallelisierungsschema}
-	\begin{itemize}
-		\item Implementierung des Felds durch 2D-Array von structs (Ideas)
-		\item Es werden zwei Felder erstellt:
-		\begin{lstlisting}[language=C,basicstyle=\small,keywordstyle=\color{black}]		
-		malloc_idea_matrix(field)
-		malloc_idea_matrix(field_new)
-		\end{lstlisting}		
-		\item sich bewegte Ideen werden in neues Feld kopiert
-		\begin{lstlisting}
-		#define copy_field_into_field_new()        
-		    for_every(i, num_rows, {               
-		        for_every(j, num_cols, {           
-		            field_new[i][j] = field[i][j]; 
-		          });                              
-		    });
-		    \end{lstlisting}		
-	\end{itemize}	
+\begin{frame}{field und field\_new}
+\begin{itemize}
+  \item Beginn der Runde: field und field\_new gleicher Inhalt
+  \item Iterieren über field
+  \item Bewegte Ideen werden in field\_new geschrieben
+  \item Modifizierte Ideen werden in field und field\_new geschrieben
+  \item Ende der Runde: field\_new in field kopieren
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Parallelisierungsschema}
+\begin{frame}[fragile]{Implementation Kopieren}
+	\begin{lstlisting}[language=C,basicstyle=\small,breaklines=true,keywordstyle=\color{black}]
+#define for_every(i, size, f) 
+  for(int i=0; i<size; i++) { f; }
+
+... 
+
+#define copy_field_new_into_field()    \
+  for_every(i, num_rows, {             \
+    for_every(j, num_cols, {           \
+        field[i][j] = field_new[i][j]; \
+      });                              \
+  }); 
+	  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Aufteilung Feld auf Prozesse}
 	\begin{picture}(0,0)
-		\put(30,-80){\includegraphics[scale=0.9]{finalPresentation/pics/real-ghost-rows.jpg}}
+		\put(10,-100){\includegraphics[scale=0.5]{finalPresentation/pics/rows-procs.png}}
 	\end{picture}
 \end{frame}
 
-\begin{frame}{Parallelisierungsschema}
-	\begin{itemize}
-		\item horizontales Kommunikationsmuster
-		\item am oberen bzw. unteren Rand ghost row
-		\item Ziehen unabhängig von anderen Prozessen möglich
-	\end{itemize}
+\begin{frame}{Kommunikation über "ghost rows"}
+	\begin{picture}(0,0)
+		\put(30,-80){\includegraphics[scale=0.9]{finalPresentation/pics/real-ghost-rows.jpg}}
+	\end{picture}
 \end{frame}
 
 \begin{frame}[fragile]{Parallelisierungsschema}
@@ -117,6 +87,7 @@
   MPI_Irecv(ideas_arr, num_cols, 
     mpi_idea_type, from, tag, MPI_COMM_WORLD, &req) 
 \end{lstlisting}
+
 \end{frame}
 
 \begin{frame}[fragile]{Parallelisierungsschema}
@@ -136,18 +107,47 @@
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}{Visualisierung}
+\begin{frame}[fragile]{MPI-Code Überblick}
+\begin{lstlisting}[language=C,basicstyle=\tiny,breaklines=true,keywordstyle=\color{black}]
+  // INDEPENDENT ROWS
+  if (num_rows >= 7) move_ideas(2, num_rows-5);
+  barrier();
+
+  // DEPENDENT ROWS TOP
+  move_ideas(0, 3); 
+  barrier();
+
+  send_top_rows(field_new);
+  receive_into_bottom_rows(field_new);
+  barrier();
+
+  // DEPENDENT ROWS BOTTOM
+  move_ideas(num_rows - 4, 3);  
+  barrier();
+
+  send_bottom_rows(field_new);
+  receive_into_top_rows(field_new);
+  barrier();
+
+  copy_field_new_into_field();
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Implementation Visualisierung}
 	\begin{itemize}
-		\item lokale Visualisierung mithilfe von Pygame
-		\item Pro Runde ein File
-		\item im Nachhinein: Einlesen in Python
-		\item Problem: Files werden zuerst auf dem Cluster gespeichert und muessen nach local kopiert werden
+		\item lokal mit Python/Pygame
+		\item Output von C pro rank in out/\$round-\$rank files
+		\item im Nachhinein: Rundenweise Einlesen der Files im Pygame-Loop
+		\item Problem mit Integration des Clusters: rsync bottleneck
 	\end{itemize}
 \end{frame}
 
 \begin{frame}{Optimierung}
 	\begin{itemize}
 		\item Ersetzen von Send/Recv mit Isend/Recv (10 \% Speedup)
-		\item 
+		\item field / field\_new Kopieren per memcpy: fail
+    \item Generell: gefühlte Fragilitaet von MPI Code bewog zu defensivem Verhalten - bloß nichts mehr kaputt machen (Beispiel: lieber mehr als zuwenig Barriers)
+    \item Motivationsmangel: Performance von C eh mehr als ausreichend, Bottleneck bei
+      Visualisierung und rsyncing vom Cluster
 	\end{itemize}
 \end{frame}
