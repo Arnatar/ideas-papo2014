@@ -2,7 +2,7 @@
 %TODO :
 \subtitle{Praktikumsbericht}
 
-\author{Arne Struck, Manuel Börries, Jonathan Werner}
+\author{Arne Struck, Jonathan Werner}
 
 \institute{Universität Hamburg \\ 
   Fakultät für Mathematik, Informatik und Naturwissenschaften \\
@@ -22,24 +22,23 @@ Aufgabenstellung: \\
 Die Erstellung einer parallelen, clusterfähigen Simulation mittels MPI. \\ \\
 Projekt Idee: \\
 Die Untersuchung der Verbreitung von Meinungen, Vorstellungen innerhalb einer Population.
-\keywords{Keywords}
+%\keywords{Keywords}
 \end{abstract}
 
 \tableofcontents
 \newpage
 \section{Projekt-Idee}
-Dieses Projekt soll die Verbreitung und Konkurrenz von Ideen im Sinne einer Weltanschauung, eines kontroversen Themas innerhalb einer begrenzten Population untersuchen und deren Mechanismen simulieren. 
-Die Ideen sollen hierbei durch Kommunikation der Individuen und durch Entwicklung veränderbar sein. \\
-Des weiteren darf es keine ''unrealistischen'' Entwicklungen geben. 
-Niemand der gerade erst das Feuer entdeckt hat, baut am nächsten Tag eine Rakete. Dies bedeutet es gibt lediglich eine geringe Dichte qualitativ hochwertiger Ideen.
+Dieses Projekt soll die Verbreitung und Konkurrenz von Ideen - im Sinne einer Weltanschauung oder eines kontroversen Themas - innerhalb einer begrenzten Population untersuchen und deren Mechanismen simulieren. 
+Die Ideen sollen hierbei durch Kommunikation der Individuen und durch individuelle Entwicklung veränderbar sein. \\
+Des Weiteren darf es keine ''unrealistischen'' Entwicklungen geben: niemand, der gerade erst das Feuer entdeckt hat, baut am nächsten Tag eine Rakete. Dies bedeutet, dass es lediglich eine geringe Dichte qualitativ hochwertiger Ideen gibt.
 
 \section{Modellierung}
 In diesem Abschnitt wird ein Überblick über die Modellierung der Ideen, der Welt und der Menschen in ihr gegeben. 
-Details zur eigentlichen Implementation, insbesondere zur Aufteilung auf mehrere Prozesse sind im Abschnitt Implementation zu finden.
+Details zur eigentlichen Implementation, insbesondere zur Aufteilung auf mehrere Prozesse, sind im Abschnitt Implementation zu finden.
 \subsection{Die Welt}
 \begin{minipage}[t]{0.48\textwidth}
-	In 2 Dimensionen betrachtet besteht die Welt aus einem Grid, deren jeweilige Enden miteinander verbunden sind. 
-	In einer dreidimensionalen Betrachtung entsteht somit ein Torus-Körper.
+	In zwei Dimensionen betrachtet besteht die Welt aus einem Grid, dessen jeweilige Enden miteinander verbunden sind. 
+	In einer dreidimensionalen Betrachtung entsteht somit ein Torus.
 \end{minipage}
 \begin{minipage}[t]{0.48\textwidth}
 	\begin{picture}(0,0)
@@ -48,40 +47,39 @@ Details zur eigentlichen Implementation, insbesondere zur Aufteilung auf mehrere
 \end{minipage}	
 
 \subsection{Die Idee}
-Eine Idee kann viele Eigenschaften haben, die wichtigen Faktoren um andere Menschen von ihr zu überzeugen lassen sich allerdings grob durch die drei folgenden modellieren. 
-Die Qualität, die Komplexität, als auch eine arbiträre durch Zahlen ermöglichte Darstellung des Raumes in dem die Idee angesiedelt ist, im folgenden Weltanschauungswert genannt, ergeben zusammen eine Idee.  \\
+Eine Idee kann viele Eigenschaften haben; die wichtigen Faktoren, um andere Menschen von ihr zu überzeugen, lassen sich allerdings grob durch folgende drei modellieren:
+die Qualität, die Komplexität und eine arbiträre, durch Zahlen ermöglichte Darstellung des Raumes, in dem die Idee angesiedelt ist - im folgenden Weltanschauungswert genannt - ergeben zusammen eine Idee.  \\
 Die Qualität einer Idee soll den Grad ihrer Überzeugungskraft repräsentieren. 
-Ein hoher Qualitätswert deutet auf eine qualitativ hochwertige Idee hin.
-Die Komplexität hängt mit diesem Wert zusammen, ist allerdings nicht der Selbe, da auch nicht sehr überzeugende Ideen komplex und elaboriert sein können und umgekehrt. Es kann daher komplexe aber gleichzeitig qualitativ schlechte Ideen geben.
+Die Komplexität hängt mit diesem Wert zusammen, ist allerdings nicht derselbe, da auch nicht sehr überzeugende Ideen komplex und elaboriert sein können und umgekehrt. Es kann daher komplexe aber gleichzeitig qualitativ schlechte Ideen geben.
 
 \subsection{Der Mensch}
 Ein Mensch besitzt zwei für die Simulation relevante, darstellbare Eigenschaften. 
-Die eine ist die Idee selbst, die andere ist ein Weltanschauungswert, ähnlich der der Idee. 
-Allerdings repräsentiert der Weltanschauungswert des Menschens restlichen Ideen, welche er besitzt, die allerdings nicht direkt das Themengebiet der untersuchten Ideen-Gruppe berühren, sondern nur indirekte Einflüsse darauf haben. 
-Ein Beispiel hierfür wäre das Mathematikverständnis eines Menschen der Antike betreffend der Frage ob die Erde einer Kugel ähnelt oder nicht.
+Die eine ist die Idee selbst, die andere ist ein Weltanschauungswert, ähnlich dem der Idee. 
+Allerdings repräsentiert der Weltanschauungswert des Menschens restliche Ideen, welche er besitzt, die allerdings nicht direkt das Themengebiet der untersuchten Idee berühren, sondern nur indirekten Einfluss auf diese haben. 
+Ein Beispiel hierfür wäre das Mathematikverständnis eines Menschen der Antike, betreffend der Frage ob die Erde einer Kugel ähnelt oder nicht.
 
 \subsection{Ablauf}
 Zuerst wird eine Population von Menschen mit Ideen durchschnittlich geringer Qualität und Komplexität mit zufälligen Weltanschauungswerten in der Welt geschaffen. 
 Die Weltanschauungswerte der Menschen sind in der Nähe ihrer initialen Ideen angesiedelt. \\
-Nun beginnen die verschiedenen Menschen in Runden auf der Welt zu ziehen. 
-Zuerst wird die Möglichkeit der Entwicklung einer neuen Idee und/oder die Veränderung der Weltanschauungswerte evaluiert, diese ist relativ gering, tritt jedoch dem Gesetz der großen Zahlen folgend bei einigen Individuen alle paar Runden ein. 
-Daraufhin werden die Möglichkeiten zur Kommunikation erfasst. Sollte ein anderes Individuum sich in Reichweite befinden, wird mit einer gewissen Wahrscheinlichkeit ein Kommunikationsversuch gestartet. 
-Die Wahrscheinlichkeit resultiert aus dem menschlichen Verhalten nicht mit jedem Individuum aus seiner Umgebung Konversation zu betreiben.
+Nun beginnen die verschiedenen Menschen sich rundenweise auf der Welt fortzubewegen. 
+Zuerst wird nun die Möglichkeit der Entwicklung einer neuen Idee und/oder die Veränderung der Weltanschauungswerte evaluiert. Diese ist relativ gering, tritt jedoch dem Gesetz der großen Zahlen folgend bei einigen Individuen alle paar Runden ein. \\
+Daraufhin werden die Möglichkeiten zur Kommunikation erfasst. Sollte sich ein anderes Individuum in Reichweite befinden, wird mit einer gewissen Wahrscheinlichkeit ein Kommunikationsversuch gestartet. 
+Die Wahrscheinlichkeit resultiert aus dem menschlichen Verhalten, nicht mit jedem Individuum aus seiner Umgebung Konversation zu betreiben.
 Zum Schluss wird ein Individuum seine Möglichkeiten zur Bewegung evaluieren.
 
 \subsection{Entwicklung}
 Die Entwicklung einer Idee erfolgt durch Mutation.
-Jeder Mensch hat jede Runde eine Mutationschance sowohl für den Qualitäts-, Komplexitätskomplex, als für den Weltanschauungskomplex.
-Beide Mutationen laufen ähnlich ab, zuerst wird eine Richtung gewählt, um zu gewährleisten dass die Eigenschaften nicht in 2 Richtungen mutieren. 
-Darauf werden die Mutationsraten der einzelnen Elemente berechnet und diese angepasst.
-Bei dem Weltanschauungskomplex existiert noch die finale Absicherung, dass die Differenz beider Werte einen nicht Schwellwert überschreiten.
+Jeder Mensch hat jede Runde eine Mutationschance für den Qualitäts-, Komplexitäts- und Weltanschauungswert.
+Alle Mutationen laufen ähnlich ab: zuerst wird eine Richtung gewählt, um zu gewährleisten, dass die Eigenschaften nicht in zwei Richtungen mutieren. 
+Dann werden die Mutationsraten der einzelnen Elemente berechnet und angepasst.
+Bei dem Weltanschauungswert existiert noch die finale Absicherung, dass die Differenz beider Werte einen Schwellwert nicht überschreiten.
 \newpage
 \subsection{Kommunikation, Konkurrenz und Einschränkungen}
 \begin{minipage}[t]{0.48\textwidth}
 Bevor es zu einer Kommunikation kommt, muss ein möglicher Kommunikationspartner gefunden werden.
 Dieser muss sich (wie rechts dargestellt) in einem benachbartem Feld befinden. 
 So können die grüne und die blaue Idee miteinander konkurrieren, der Violetten ist dies allerdings nicht möglich. 
-Sollten mehrere Kommunikationspartner zur Verfügung stehen, so werden alle betrachtet und einer wird fair ausgewählt.  \\
+Sollten mehrere Kommunikationspartner zur Verfügung stehen, so werden alle betrachtet und einer wird ausgewählt.  \\
 Die eigentliche Kommunikation ist in drei Phasen geteilt. 
 Nun da ein Kommunikationspartner gefunden ist, wird entschieden ob die beiden sich austauschen.
 \end{minipage}
@@ -96,13 +94,13 @@ Nun da ein Kommunikationspartner gefunden ist, wird entschieden ob die beiden si
 \end{picture}
 \end{minipage}
 \quad \\ \quad \\
-Ist dies geschehen und positiv ausgefallen muss berechnet werden, ob sie einander überzeugen können.
+Ist dies geschehen und positiv ausgefallen, muss berechnet werden, ob sie einander überzeugen können.
 Dies hängt von Faktoren wie der Komplexitätsdifferenz und den Unterschieden zwischen dem Weltanschauungswert der Zielperson und der Ursprungsidee ab. Je höher die Komplexitätsdifferenz ist, desto größer ist die Wahrscheinlichkeit, dass eine Überzeugung fehlschlägt, da davon auszugehen ist, dass die beiden Menschen auf verschiedenen Ebenen denken und sich nicht von dem anderen überzeugen lassen wollen. Die Inkompatibilität sich stark unterscheidender Weltanschauungswerte sollte auf der Hand liegen. \\
 Sollte eine Kompatibilität festgestellt werden, so muss ermittelt werden, welche der beiden Ideen die andere dominiert. Dies geschieht anhand eines Qualitätsabgleichs mit einem zufälligen temporären Aufschlag auf die Qualitätswerte beider Ideen. Dieser Aufschlag repräsentiert mögliche sonstige Einflüsse wie beispielsweise die Eloquenz des Gegenübers. \\
 Wenn nun ein Gewinner feststeht, muss der Verlierer seine Meinung, respektive seine Idee ändern. Dies ist leicht durch die direkte Übernahme zu garantieren. Allerdings muss auch der Weltanschauungswert des verlierenden Menschens an die Idee angepasst werden, da die Idee einen Einfluss auf diesen hat. \\
 
 \subsection{Bewegung}
-Nicht alle Menschen gehen einer missionarischen Tätigkeit (welche Anschauung sie auch immer vertreten) sondern vielen anderen Beschäftigungen nach und verbreiten ihre Ideen eher ungerichtet an andere. \\
+Nicht alle Menschen gehen einer missionarischen Tätigkeit (welche Anschauung sie auch immer vertreten), sondern vielen anderen Beschäftigungen nach und verbreiten ihre Ideen eher ungerichtet an andere. \\
 Nun gäbe es die Möglichkeit diese Tätigkeiten zu simulieren, dies erscheint allerdings in Anbetracht der Projekt-Idee wenig zielführend, daher ist die Wahl der Bewegungsart auf eine zufällige Wahl aus den maximal 9 erreichbaren Feldern gefallen, welche als eine ausreichende Abstraktion der anderen Tätigkeiten erscheint. 
 Natürlich existieren auch Missionare in dem Sinn, dass sie ihre Idee einer breiten Masse zugänglich machen, allerdings muss ein zu überzeugender Mensch erst einmal (zum Beispiel durch Mundpropaganda oder zufällige Entdeckung, wenn der Missionar noch unbekannt ist) auf diese Missionare stoßen.
 Somit stellt dies kein Argument für die Einschränkung einer zufälligen Bewegung dar. \\ \\
@@ -118,7 +116,7 @@ Die möglichen Bewegungen sind hier noch einmal grafisch in rot zu sehen dargest
 
 \section{Implementation}
 \subsection{Logik und Idee \& Mensch}
-Die im Abschnitt Modellierung geschilderten Modellierungen sind mit einer Ausnahme eins zu eins in Software umgesetzt, wobei die verschiedenen Grenzen und Wahrscheinlichkeiten modifiziert werden können. Die Ausnahme betrifft die Repräsentation eines Menschen und seiner Idee, diese sind durch einen struct mit 4 Feldern repräsentiert, wobei noch ein weiteres Feld als Flag für eine empty-idea hinzukommt.
+Die im Abschnitt Modellierung geschilderten Modellierungen sind mit einer Ausnahme eins zu eins in Software umgesetzt, wobei die verschiedenen Grenzen und Wahrscheinlichkeiten modifiziert werden können. Die Ausnahme betrifft die Repräsentation eines Menschen und seiner Idee: diese sind durch einen struct mit 4 Feldern repräsentiert, wobei noch ein weiteres Feld als Flag für eine empty-idea hinzukommt.
 
 \subsection{Parallelisierungsschema}
 Das Feld wird implementiert durch ein 2D-Array über den struct Ideas.
@@ -275,6 +273,7 @@ Folgende Optimierungen haben wir unter anderem im Laufe der Entwicklung vorgenom
 \begin{enumerate}
 	\item \texttt{MPI\_Isend/Recv} anstelle von \texttt{Send/Recv} einsetzen.
 Dies brachte ca. 10\% Speedup.
+  \item Das Kommunikationsmuster optimieren: erst war es so angelegt, dass alle geraden ranks sowohl top und bottom rows senden, die ungeraden diese empfangen; in einem zweitem Schritt dann vice versa. Aufgrund dessen musste die Anzahl der Prozesse gerade sein, da es sonst bezüglich des ersten und letzten Prozesses zu einem Deadlock gekommen wäre.
 	\item Den \texttt{field\_new} -\textgreater{} \texttt{field} Kopiervorgang nur einmal ausführen.
 Dies war Bestandteil eines tieferen Problems, welches uns viele Stunden durch Bugs beschäftigt hat, auch wenn es im Nachhinein trivial wirkt, die ersten Wochen hatten wir das \texttt{field} (und nicht \texttt{field\_new} in der MPI-Kommunikation verschickt.
 Dies führte zu Korruptionen im Feld, die Ideen vermehrten sich manchmal, bei einer genügend hohen Ideendichte.
