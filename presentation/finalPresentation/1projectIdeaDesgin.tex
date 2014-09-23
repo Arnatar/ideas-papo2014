@@ -1,12 +1,13 @@
-\section{Projekt-Idee}
-\begin{frame} {}
-	\textbf{(Grobe) Simulation von Entwicklung konkurrierender Ideen in einer begrenzten Welt.}
+\section{}
+\begin{frame} {Ziel}
+	\begin{block}{}
+		\textbf{(Grobe) Simulation von Entwicklung konkurrierender Ideen in einer begrenzten Welt.}
+	\end{block}
 \end{frame}
 
 \section{Modellierung}
-
-
-\begin{frame}
+\subsection{Grundstruktur}
+\begin{frame} {Population}
 	\begin{columns}[T] % align columns
 		\begin{column}{.73\textwidth}
 			\begin{block} {Idee}
@@ -34,29 +35,30 @@
 \begin{frame} {Welt \& Bewegung}
 	\begin{picture}(0,0)
 		\uncover<1-3> {
-			\put(10,55){
+			\put(22,70){
 				\begin{minipage}[t]{0.4\linewidth}
 				{\textbf{Die Welt}}
 				\end{minipage}}
-			\put(-20,-40){\includegraphics<1-3>[scale=0.3]{finalPresentation/pics/Torus.png}}
+			\put(-10,-20){\includegraphics<1-3>[scale=0.3]{finalPresentation/pics/Torus.png}}
 			}
 		\uncover<2-3> {
-			\put(215,70){
+			\put(215,60){
 				\begin{minipage}[t]{0.4\linewidth}
 				{\textbf{Bewegungsziele}}
 				\end{minipage}}
-			\put(215,-30){\includegraphics<2-3>[scale=0.2]{finalPresentation/pics/GridMov.png}}
+			\put(215,-40){\includegraphics<2-3>[scale=0.2]{finalPresentation/pics/GridMov.png}}
 		}	
 		\uncover<3> {
-			\put(115,-20){
+			\put(115,-15){
 				\begin{minipage}[t]{0.4\linewidth}
 				{\textbf{Kommunikation}}
 				\end{minipage}}
-			\put(120,-115){\includegraphics<3>[scale=0.1]{finalPresentation/pics/GridComm.png}}
+			\put(120,-105){\includegraphics<3>[scale=0.1]{finalPresentation/pics/GridComm.png}}
 		}		
 	\end{picture}
 \end{frame}
 
+\subsection{Logikabschnitte}
 \begin{frame} {Kommunikation}
 	\textbf{3-Phasen:}
 	\begin{itemize}
