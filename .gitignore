@@ -65,3 +65,6 @@ tmp/
 run
 *.pyc
 
+.local.vimrc
+.run
+.run2
