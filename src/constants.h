@@ -4,13 +4,13 @@
 
 // ------for logic.c------
 // competition test, maximum difference between target human wv and origin ideas wv
-#define MAX_CWV_VS_HWV  4
+#define MAX_CWV_VS_HWV  6
 
 // competition test, maximum difference between origin & targen cmplxty
-#define MAX_CMPLX_DIFF 4
+#define MAX_CMPLX_DIFF 5
 
 // conversation barrier (lower = less likely) 10000-1 to 90000-1 max val (based on complexity-difference)
-#define CONVERSATION_BARRIER 2000
+#define CONVERSATION_BARRIER 10000
 
 // winner calculation, with random represented other environment influences range
 #define ENV_INF_RANGE 7
@@ -19,13 +19,13 @@
 #define CL_ADJ_RANGE 1
 
 // quality & cmplxty mutation chance, 100000 - 1 max val
-#define QC_MUT_CHANCE 50
+#define QC_MUT_CHANCE 100
 
 // quality & cmplxty mutation range
 #define QC_MUT_RANGE 1
 
 // WV mutation chance, 100000 - 1 max val both WVs
-#define WV_MUT_CHANCE 10
+#define WV_MUT_CHANCE 50
 
 // WV mutation range both WVs
 #define WV_MUT_RANGE 1
@@ -37,13 +37,13 @@
 // ------for idea.c------
 // chances in pro mil
 // spawn chance for best possible ideas
-#define BEST_IDEA_CHANCE 50
+#define BEST_IDEA_CHANCE 0
 
 // spawn chance for medium possible ideas
-#define MED_IDEA_CHANCE 100
+#define MED_IDEA_CHANCE 10
 
 // spawn quality-cmplxty dependency range
-#define QUAL_CMPLXTY_DEP_RANGE 1 
+#define QUAL_CMPLXTY_DEP_RANGE 2 
 
 // spawn WV-differenc range
 #define WV_DIFF_RANGE 2

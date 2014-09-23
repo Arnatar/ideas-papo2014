@@ -29,11 +29,11 @@ pygame: setup_draw_data_folder
 pygame: procs=4
 pygame: x=200
 pygame: y=200
-pygame: rounds=1500
+pygame: rounds=1700
 pygame: ideas=4000
 pygame: framerate=30
-pygame: export_gif=0
-pygame: outfile=out.gif
+pygame: export_gif=1
+pygame: outfile=out.mp4
 pygame: build_executable
 pygame: run
 pygame: run_draw

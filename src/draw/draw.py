@@ -19,7 +19,7 @@ from collections import Counter
 
 # stats ------------------------------------------------------------------------
 compare_wv_counts=1
-compare_avg_qual_per_wv=1
+compare_avg_qual_per_wv=0
 
 STATS_BRIGHTS="% qual>5"
 STATS_AVG_QUAL="avg qual"
