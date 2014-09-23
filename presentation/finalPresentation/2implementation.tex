@@ -107,7 +107,7 @@ malloc_idea_matrix(field_new)
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile,allowframbreaks]{MPI-Code Überblick}
+\begin{frame}[allowframebreaks,fragile]{MPI-Code Überblick}
 \begin{lstlisting}[language=C,basicstyle=\small,breaklines=true,keywordstyle=\color{black}]
   // INDEPENDENT ROWS
   if (num_rows >= 7) move_ideas(2, num_rows-5);
@@ -121,6 +121,7 @@ malloc_idea_matrix(field_new)
   receive_into_bottom_rows(field_new);
   barrier();
 \end{lstlisting}
+\framebreak
 \begin{lstlisting}[language=C,basicstyle=\small,breaklines=true,keywordstyle=\color{black}]
   // DEPENDENT ROWS BOTTOM
   move_ideas(num_rows - 4, 3);  
