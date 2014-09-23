@@ -148,6 +148,7 @@ malloc_idea_matrix(field_new)
 	\begin{itemize}
 		\item Ersetzen von Send/Recv mit Isend/Recv (10 \% Speedup)
 		\item field / field\_new Kopieren per memcpy: fail
+    \item Kommunikationsmuster: erst: nur gerade \# ranks erlaubt, da Abfolge war: (1) alle gerade ranks senden alles, ungerade ranks empfangen alles; (2) vice versa
     \item Generell: gefühlte Fragilitaet von MPI Code bewog zu defensivem Verhalten - bloß nichts mehr kaputt machen (Beispiel: lieber mehr als zuwenig Barriers)
     \item Motivationsmangel: Performance von C eh mehr als ausreichend, Bottleneck bei
       Visualisierung und rsyncing vom Cluster

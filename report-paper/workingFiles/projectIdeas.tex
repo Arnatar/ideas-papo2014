@@ -275,6 +275,7 @@ Folgende Optimierungen haben wir unter anderem im Laufe der Entwicklung vorgenom
 \begin{enumerate}
 	\item \texttt{MPI\_Isend/Recv} anstelle von \texttt{Send/Recv} einsetzen.
 Dies brachte ca. 10\% Speedup.
+  \item Das Kommunikationsmuster optimieren: erst war es so angelegt, dass alle geraden ranks sowohl top und bottom rows senden, die ungeraden diese empfangen; in einem zweitem Schritt dann vice versa. Aufgrund dessen musste die Anzahl der Prozesse gerade sein, da es sonst bezüglich des ersten und letzten Prozesses zu einem Deadlock gekommen wäre.
 	\item Den \texttt{field\_new} -\textgreater{} \texttt{field} Kopiervorgang nur einmal ausführen.
 Dies war Bestandteil eines tieferen Problems, welches uns viele Stunden durch Bugs beschäftigt hat, auch wenn es im Nachhinein trivial wirkt, die ersten Wochen hatten wir das \texttt{field} (und nicht \texttt{field\_new} in der MPI-Kommunikation verschickt.
 Dies führte zu Korruptionen im Feld, die Ideen vermehrten sich manchmal, bei einer genügend hohen Ideendichte.
