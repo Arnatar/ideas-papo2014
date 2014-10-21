@@ -291,5 +291,20 @@ Leider waren Debug-Tools hier nicht wirklich hilfreich, zum einen wegen der Invo
 Dementsprechend kann man unsere Strategie bezüglich MPI, als die Funktionsfähigkeit hergestellt war als defensiv beschreiben.
 Das System erschien fragil und wir wollten endlich eine funktionierende Basis für das Testen der Simulation mit mehreren Prozessoren an sich haben.
 Daher ist eine Optimierung des MPI-Parts mehr als nicht ausgeschlossen.
+
+\section{Schluss und Ausblick}
+\subsection{Schluss}
+In der Simulation zeigt sich über längere Zeit eine Ausbreitung der globalen Qualität und die Durchsetzung von meistens Zwei Ideen, während die meisten Anderen so gut wie, bis komplett verdrängt werden.
+Zusammenfassend lässt sich sagen, dass das Ziel der Analyse von Ideen und deren Verbreitung auf einem minimalem Level erreicht wurde. Natürlich wäre eine größere Komplexität immer möglich gewesen.
+\subsection{Ausblick}
+Aufgrund einiger Planungs- und Abstimmungsschwierigkeiten konnten wir leider nicht alle Ziele umsetzen, die wir uns gesetzt hatten. 
+Des weiteren existieren im Nachhinein noch Punkte, welche nicht bedacht wurden, aber hätten bedacht und auch implementiert werden sollen.
+Dies wären im Bereich der Logik die Implementierung einer Zielgerichteten Bewegung der Menschen auf andere Menschen zu (welche für jeden Menschen eine gewisse Wahrscheinlichkeit besitzt, also die Kontaktfreudigkeit einzelner Menschen simuliert),
+eine feingranularere Darstellung der verschiedenen Ideen, also ein Wertebereich nicht von 10 Elementen, sondern eine von beispielsweise 100, diese leichte Anpassung würde zu Problemen mit der aktuellen Visualisierung führen  und ist somit doch nicht ganz unproblematisch.
+Hierdurch würde eine Neuentwicklung (also der wirkliche Spawn) von Ideen als eine sinnvolle Option erscheinen.
+Im Punkte der Optimierung hätten noch einige gemacht werden können, wobei natürlich die Möglichkeit das Speichermanagement des Feldes anstelle durch memcpy durch Pointer zu realisieren heraus sticht.
+Im Punkte der Visualisierung wäre eine Beschleunigung der Visualisierung, sowie eine Verkleinerung der Bottleneck-Problematik wünschenswert gewesen, obwohl kein Ansatz hierfür gefunden wurde, als die Visualisierung neu zu schreiben.
+Wenn man den Ansatz der Reimplementation verfolgt wäre die Nutzung der sdl library oder das qt framework, also eine weitere Nutzung c oder c++ wünschenswert gewesen, welches aber durch den schon großen Lernaufwand der Gruppe als nicht zweckdienlich erachtet wurden.
+
 %\pagebreak
 %\nocite{*}
